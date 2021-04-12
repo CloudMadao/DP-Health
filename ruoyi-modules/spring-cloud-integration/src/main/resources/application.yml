@@ -1,0 +1,21 @@
+server:
+  port: 2602
+
+spring:
+  application:
+    name: spring-cloud-integration
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:orcl
+    username: nscrl
+    password: 123456
+    driver-class-name: oracle.jdbc.OracleDriver
+
+
+mybatis:
+  type-aliases-package: min.ahut.domain
+  mapper-locations: classpath:mapper/*.xml

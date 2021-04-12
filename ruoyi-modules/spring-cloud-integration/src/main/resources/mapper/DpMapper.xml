@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="min.ahut.mapper.DpMapper">
+
+    <resultMap id="GroupResult" type="GroupEntity">
+        <result property="property" column="name"/>
+        <result property="count" column="count"/>
+    </resultMap>
+
+    <select id="getCountFromCountryByName" resultMap="GroupResult" parameterType="String">
+        SELECT SGUARDIANCOUNTRY as name,COUNT(SGUARDIANCOUNTRY) as count FROM "PSYCHOSISPERSONINFO"
+        <where>
+            <if test="countryName!=null and countryName.length!=0">
+                SGUARDIANCOUNTRY in
+                <foreach item="item"  collection="countryName" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+         GROUP BY SGUARDIANCOUNTRY
+    </select>
+
+</mapper>

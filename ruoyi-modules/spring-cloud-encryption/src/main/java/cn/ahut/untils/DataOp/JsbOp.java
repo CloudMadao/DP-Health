@@ -1,6 +1,5 @@
 package cn.ahut.untils.DataOp;
 
-import breeze.linalg.sum;
 import cn.ahut.Mapper.personMapper;
 import cn.ahut.entity.PersonInfo;
 import cn.ahut.entity.key.PrivateKey;
@@ -9,7 +8,6 @@ import cn.ahut.untils.BGNKey.get_PrivateKey;
 import cn.ahut.untils.BGNKey.get_PubilcKey;
 import cn.ahut.untils.BGNOp.DoAdd;
 import cn.ahut.untils.BGNOp.DoDecrypt;
-import cn.ahut.untils.BGNOp.DoEncrypt;
 import cn.ahut.untils.Get_Param;
 import cn.ahut.untils.Get_date_year;
 import it.unisa.dia.gas.jpbc.Element;
@@ -21,7 +19,10 @@ import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class JsbOp {

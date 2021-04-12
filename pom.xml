@@ -210,6 +210,7 @@
         <module>datashow</module>
         <module>ruoyi-datashow</module>
         <module>have-fun</module>
+        <module>spring-cloud-Integration</module>
     </modules>
     <packaging>pom</packaging>
 

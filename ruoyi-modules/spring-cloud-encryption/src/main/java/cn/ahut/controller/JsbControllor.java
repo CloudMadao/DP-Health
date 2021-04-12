@@ -12,8 +12,6 @@ import cn.ahut.untils.BGNKey.get_PrivateKey;
 import cn.ahut.untils.BGNKey.get_PubilcKey;
 import cn.ahut.untils.BGNOp.DoDecrypt;
 import cn.ahut.untils.Get_Param;
-
-
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
@@ -22,7 +20,6 @@ import it.unisa.dia.gas.jpbc.PairingParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1Pairing;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,7 +28,6 @@ import java.util.List;
 /**
  * Created by wzw on 2020/10/30.
  */
-
 @RestController
 @RequestMapping("/jsb")
 public class JsbControllor extends BaseController {
@@ -70,7 +66,6 @@ public class JsbControllor extends BaseController {
     {
         return toAjax(jsbDataShow.deleteJsbBySno(sno));
     }
-
 
 
     /**
@@ -126,12 +121,5 @@ public class JsbControllor extends BaseController {
         list.add(jmpsychosispersoninfop);
         return getDataTable(list);
     }
-
-    /**
-     * 统计
-     * @param
-     * @return
-     */
-
 
 }

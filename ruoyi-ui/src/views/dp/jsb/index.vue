@@ -1,8 +1,7 @@
 <template>
   <div class="app-container">
-
     <el-row :gutter="10" class="mb8">
-
+      <div id="main" class="pie-class" :style="{width: '600px', height: '400px' }"/>
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -31,183 +30,34 @@
         >删除</el-button>
       </el-col>
 
+
       <el-col :span="1.5">
-        <el-dropdown>
-          <el-button type="warning">
-            按条件统计数据<i class="el-icon-arrow-down el-icon--right"></i>
+        <el-dropdown trigger="click" :hide-on-click="false">
+          <el-button type="warning" size="mini" >
+            信息统计<i class="el-icon-arrow-down el-icon--right"></i>
           </el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
+              <el-form :model="queryParams.sguardiancountry"  :inline="true">
 
-                <el-form-item label="肇事次数" prop="sguardianname">
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择起始日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                  <el-col class="line" :span="2">-</el-col>
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择终止日期" v-model="form.date2" style="width: 100%;"></el-date-picker>
-                  </el-col>
+                <el-form-item label="患者地址" prop="sguardiancountry">
+                  <el-select v-model="queryParams.sguardiancountry"  placeholder="请选择县区">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
                 </el-form-item>
+
                 <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="ihitshow">数据统计</el-button>
+                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="countryCount">统计</el-button>
                 </el-form-item>
               </el-form>
             </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="自伤次数" prop="sguardianname">
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择起始日期" v-model="form.date3" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                  <el-col class="line" :span="2">-</el-col>
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择终止日期" v-model="form.date4" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">数据统计</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="自杀次数" prop="sguardianname">
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择起始日期" v-model="form.date5" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                  <el-col class="line" :span="2">-</el-col>
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择终止日期" v-model="form.date6" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">数据统计</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="住院次数" prop="sguardianname">
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择起始日期" v-model="form.date7" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                  <el-col class="line" :span="2">-</el-col>
-                  <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择终止日期" v-model="form.date8" style="width: 100%;"></el-date-picker>
-                  </el-col>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">数据统计</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </el-col>
-
-
-
-      <!--按条件搜索-->
-      <el-col :span="1.5">
-        <el-dropdown>
-          <el-button type="primary">
-            按条件搜索<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="角色名称" prop="sguardianname">
-                  <el-input
-                    v-model="queryParams.sguardianname"
-                    placeholder="请输入角色名称"
-                    clearable
-                    size="small"
-                    style="width: 240px"
-                    @keyup.enter.native="handleQuery"
-                  />
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="肇事次数" prop="sguardianname">
-                  <el-input
-                    v-model="queryParams.sguardianname"
-                    placeholder="请输入肇事次数"
-                    clearable
-                    size="small"
-                    style="width: 240px"
-                    @keyup.enter.native="handleQuery"
-                  />
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="精神病症状" prop="sguardianname">
-                  <el-input
-                    v-model="queryParams.sguardianname"
-                    placeholder="请输入精神病症状"
-                    clearable
-                    size="small"
-                    style="width: 240px"
-                    @keyup.enter.native="handleQuery"
-                  />
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="重症精神病" prop="sguardianname">
-                  <el-input
-                    v-model="queryParams.sguardianname"
-                    placeholder="请输入重症精神病症状"
-                    clearable
-                    size="small"
-                    style="width: 240px"
-                    @keyup.enter.native="handleQuery"
-                  />
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-
-                <el-form-item label="地区" prop="sguardianname">
-                  <el-input
-                    v-model="queryParams.sguardianname"
-                    placeholder="地区"
-                    clearable
-                    size="small"
-                    style="width: 240px"
-                    @keyup.enter.native="handleQuery"
-                  />
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
+<!--            <el-dropdown-item>黄金糕</el-dropdown-item>
+            <el-dropdown-item>狮子头</el-dropdown-item>-->
           </el-dropdown-menu>
         </el-dropdown>
       </el-col>
@@ -216,9 +66,6 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <div style="font-size: 14px;color: #A8A8A8 ">
-      查询到47条数据，耗时约2s
-    </div>
 
      <el-table v-loading="loading" :data="jsbList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
@@ -279,19 +126,6 @@
       </div>
     </el-dialog>
 
-    <!-- 肇事次数统计图 -->
-    <el-dialog :title="title" :visible.sync="ihitimage" width="500px" append-to-body>
-      <div class="block">
-        <span class="demonstration">统计数据柱状图</span>
-        <el-image :src="testimage"></el-image>
-      </div>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">统计发布</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
-
     <!-- 分配角色数据权限对话框 -->
     <el-dialog :title="title" :visible.sync="openDataScope" width="500px" append-to-body>
       <el-form :model="form" label-width="80px">
@@ -341,12 +175,14 @@
 </template>
 
 <script>
-  import {changeRoleStatus, dataScope, getRole} from "@/api/system/role";
-  import {roleMenuTreeselect, treeselect as menuTreeselect} from "@/api/system/menu";
-  import {roleDeptTreeselect, treeselect as deptTreeselect} from "@/api/system/dept";
-  import {delJsb, jmJsb, listJsb} from "@/api/ttjm/ttjm";
+import {changeRoleStatus, dataScope, getRole} from "@/api/system/role";
+import {roleMenuTreeselect, treeselect as menuTreeselect} from "@/api/system/menu";
+import {roleDeptTreeselect, treeselect as deptTreeselect} from "@/api/system/dept";
+import {delJsb, jmJsb, listJsb} from "@/api/ttjm/ttjm";
+import {groupCountry, groupCountryPost} from "@/api/dp/dp";
+import * as echarts from 'echarts';
 
-  export default {
+export default {
   name: "Jsb",
   data() {
     return {
@@ -404,6 +240,31 @@
           label: "仅本人数据权限"
         }
       ],
+
+      options: [{
+        value: '花山区',
+        label: '花山区'
+      }, {
+      value: '雨山区',
+        label: '雨山区'
+    }, {
+      value: '博望区',
+        label: '博望区'
+    }, {
+      value: '当涂县',
+        label: '当涂县'
+    }, {
+      value: '含山县',
+        label: '含山县'
+    }, {
+        value: '和县',
+        label: '和县'
+      }],
+
+      echartparam:[],
+      echartparamx:[],
+      echartparamy:[],
+
       // 菜单列表
       menuOptions: [],
       // 部门列表
@@ -413,6 +274,7 @@
         pageNum: 1,
         pageSize: 20,
         Name: undefined,
+        sguardiancountry: []
       },
       // 表单参数
       form: {
@@ -423,7 +285,8 @@
         ssymptomscode: '',
         spsychosiscode: '',
         ihit: '',
-        schargephysician: ''
+        schargephysician: '',
+        region: ''
       },
 
 
@@ -446,13 +309,8 @@
   },
   created() {
     this.getList();
-  /*  this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });*/
   },
   methods: {
-
-
     /** 查询菜单树结构 */
     getMenuTreeselect() {
       menuTreeselect().then(response => {
@@ -465,7 +323,6 @@
         this.deptOptions = response.data;
       });
     },
-
 
     // 所有菜单节点数据
     getMenuAllCheckedKeys() {
@@ -546,6 +403,49 @@
       };
       this.resetForm("form");
     },
+
+    /** 按照地区统计患病信息*/
+    countryCount() {
+      return groupCountryPost(this.queryParams).then(response=>{
+        this.echartparam=response.data;
+        for(let key in this.echartparam){
+          this.echartparamx.push(this.echartparam[key].property);
+          this.echartparamy.push(this.echartparam[key].count);
+        }
+        let chartDom = document.getElementById('main');
+        let myChart = echarts.init(chartDom);
+        let option = {
+          xAxis: {
+            type: 'category',
+            data: this.echartparamx,
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [{
+            data: this.echartparamy,
+            type: 'bar',
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true, //开启显示
+                  position: 'top', //在上方显示
+                  textStyle: { //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
+                },
+                color: '#2f4554',
+              }
+            },
+          }]
+        }
+        this.$nextTick(() => {
+          myChart.setOption(option);
+        });
+      })
+    },
+
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;

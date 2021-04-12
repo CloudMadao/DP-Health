@@ -15,6 +15,7 @@
         <module>spring-cloud-alibaba-dubbo-consumer</module>
         <module>spring-cloud-alibaba-dubbo-provider</module>
         <module>spring-cloud-encryption</module>
+        <module>spring-cloud-integration</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>
