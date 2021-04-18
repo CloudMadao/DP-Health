@@ -1,7 +1,23 @@
 <template>
   <div class="app-container">
+    <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
+      <el-form-item label="患者名称" prop="Name">
+        <el-input
+          v-model="queryParams.sguardianname"
+          placeholder="请输入患者名称"
+          clearable
+          size="small"
+          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
     <el-row :gutter="10" class="mb8">
-      <div id="main" class="pie-class" :style="{width: '600px', height: '400px' }"/>
+
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -11,7 +27,7 @@
         >新增</el-button>
       </el-col>
 
-      <el-col :span="1.5">
+<!--      <el-col :span="1.5">
         <el-button
           type="success"
           icon="el-icon-edit"
@@ -19,7 +35,7 @@
           :disabled="single"
           @click="handleUpdate"
         >解密</el-button>
-      </el-col>
+      </el-col>-->
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -30,39 +46,46 @@
         >删除</el-button>
       </el-col>
 
-
       <el-col :span="1.5">
-        <el-dropdown trigger="click" :hide-on-click="false">
-          <el-button type="warning" size="mini" >
-            信息统计<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>
-              <el-form :model="queryParams.sguardiancountry"  :inline="true">
-
-                <el-form-item label="患者地址" prop="sguardiancountry">
-                  <el-select v-model="queryParams.sguardiancountry"  placeholder="请选择县区">
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-
-                <el-form-item>
-                  <el-button type="cyan" icon="el-icon-search" size="mini" @click="countryCount">统计</el-button>
-                </el-form-item>
-              </el-form>
-            </el-dropdown-item>
-<!--            <el-dropdown-item>黄金糕</el-dropdown-item>
-            <el-dropdown-item>狮子头</el-dropdown-item>-->
-          </el-dropdown-menu>
-        </el-dropdown>
+        <el-button
+          type="warning"
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleImport"
+        >导入</el-button>
       </el-col>
 
 
+      <!--      <el-col :span="1.5">
+              <el-dropdown trigger="click" :hide-on-click="false">
+                <el-button type="warning" size="mini" >
+                  信息统计<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <el-form :model="queryParams.sguardiancountry"  :inline="true">
+
+                      <el-form-item label="患者地址" prop="sguardiancountry">
+                        <el-select v-model="queryParams.sguardiancountry"  placeholder="请选择县区">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+
+                      <el-form-item>
+                        <el-button type="cyan" icon="el-icon-search" size="mini" @click="countryCount">统计</el-button>
+                      </el-form-item>
+                    </el-form>
+                  </el-dropdown-item>
+      &lt;!&ndash;            <el-dropdown-item>黄金糕</el-dropdown-item>
+                  <el-dropdown-item>狮子头</el-dropdown-item>&ndash;&gt;
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-col>-->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -94,38 +117,109 @@
 
     <!-- 添加或修改角色配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="130px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="150px">
         <el-form-item label="患者姓名" prop="sguardianname">
           <el-input v-model="form.sguardianname" placeholder="请输入患者名称" />
         </el-form-item>
         <el-form-item label="患者编号" prop="sno">
           <el-input v-model="form.sno" placeholder="请输入患者编号" />
         </el-form-item>
-        <el-form-item label="患者电话" prop="spatienttelephone">
-          <el-input v-model="form.spatienttelephone"  />
+        <el-form-item label="患者县区地址" prop="sguardiancountry">
+          <el-input v-model="form.sguardiancountry" placeholder="请输入患者县区地址" />
         </el-form-item>
         <el-form-item label="监护人电话" prop="sguardiantelephone">
           <el-input v-model="form.sguardiantelephone" />
         </el-form-item>
-        <el-form-item label="精神病症状代码" prop="ssymptomscode">
-          <el-input v-model="form.ssymptomscode"  />
+        <el-form-item label="患者电话" prop="spatienttelephone">
+          <el-input v-model="form.spatienttelephone"  />
         </el-form-item>
-        <el-form-item label="重症精神病代码" prop="spsychosiscode">
-          <el-input v-model="form.spsychosiscode"  />
-        </el-form-item>
+
         <el-form-item label="肇事次数" prop="ihit">
           <el-input v-model="form.ihit" />
         </el-form-item>
-        <el-form-item label="责任医生" prop="schargephysician">
-          <el-input v-model="form.schargephysician" />
+
+        <el-form-item label="精神病症状" prop="ssymptomscode">
+          <el-select v-model="form.ssymptomscode" placeholder="请选择患者精神病症状">
+            <el-option label="幻觉" value="01"></el-option>
+            <el-option label="交流困难" value="02"></el-option>
+            <el-option label="猜疑" value="03"></el-option>
+            <el-option label="喜怒无常" value="04"></el-option>
+            <el-option label="行为怪异" value="05"></el-option>
+            <el-option label="兴奋话多" value="06"></el-option>
+            <el-option label="伤人毁物" value="07"></el-option>
+            <el-option label="悲观厌世" value="08"></el-option>
+            <el-option label="无故外走" value="09"></el-option>
+            <el-option label="自语自笑" value="10"></el-option>
+            <el-option label="孤僻懒散" value="11"></el-option>
+            <el-option label="其他" value="99"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="重症精神病症状" prop="spsychosiscode">
+          <el-select v-model="form.spsychosiscode" placeholder="请选择患者重症精神病症状">
+            <el-option label="精神分裂症" value="1"></el-option>
+            <el-option label="分裂情感性障碍" value="2"></el-option>
+            <el-option label="偏执性精神病" value="3"></el-option>
+            <el-option label="双向障碍" value="4"></el-option>
+            <el-option label="癫痫所致精神障碍" value="5"></el-option>
+            <el-option label="精神发育迟滞伴发精神障碍" value="6"></el-option>
+            <el-option label="其他" value="9"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="既往治疗效果" prop="treatmenteffectcode">
+          <el-select v-model="form.treatmenteffectcode" placeholder="请选择患者既往治疗效果">
+            <el-option label="治愈" value="1"></el-option>
+            <el-option label="好转" value="2"></el-option>
+            <el-option label="稳定" value="3"></el-option>
+            <el-option label="恶化" value="4"></el-option>
+            <el-option label="死亡" value="5"></el-option>
+            <el-option label="其他" value="9"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="医生意见" prop="sdoctoradvice">
+          <el-input v-model="form.sdoctoradvice" />
         </el-form-item>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
 
+    <!-- 导入表数据加密 -->
+    <el-dialog :title="titles" :visible.sync="opens" width="500px" append-to-body>
+      <el-form ref="form" :model="dataform"  label-width="150px">
+
+        <el-form-item label="源数据表单" prop="originTableName">
+          <el-select v-model="dataform.originTableName" placeholder="请选择源数据表单">
+            <el-option label="本地精神病患者信息表" value="PSYCHOSISPERSONINFO"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="目标数据表单" prop="targetTableName">
+          <el-select v-model="dataform.targetTableName" placeholder="请选择目标表单">
+            <el-option label="中心精神病患者信息表" value="PSYCHOSISPERSONINFOTABLE"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="起始时间">
+          <el-col :span="11">
+            <el-date-picker type="date" placeholder="选择日期" v-model="dataform.startTime" style="width: 100%;"></el-date-picker>
+          </el-col>
+          <el-col class="line" :span="2">-</el-col>
+          <el-col :span="11">
+            <el-date-picker type="date" placeholder="选择日期" v-model="dataform.endTime" style="width: 100%;"></el-date-picker>
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitDataForm">确 定</el-button>
+        <el-button @click="cancel1">取 消</el-button>
+      </div>
+    </el-dialog>
     <!-- 分配角色数据权限对话框 -->
     <el-dialog :title="title" :visible.sync="openDataScope" width="500px" append-to-body>
       <el-form :model="form" label-width="80px">
@@ -175,12 +269,11 @@
 </template>
 
 <script>
-import {changeRoleStatus, dataScope, getRole} from "@/api/system/role";
+import {changeRoleStatus, getRole} from "@/api/system/role";
 import {roleMenuTreeselect, treeselect as menuTreeselect} from "@/api/system/menu";
 import {roleDeptTreeselect, treeselect as deptTreeselect} from "@/api/system/dept";
-import {delJsb, jmJsb, listJsb} from "@/api/ttjm/ttjm";
-import {groupCountry, groupCountryPost} from "@/api/dp/dp";
-import * as echarts from 'echarts';
+import {addSufferer, delJsb, importData, jmJsb, listJsb} from "@/api/ttjm/ttjm";
+
 
 export default {
   name: "Jsb",
@@ -200,16 +293,20 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      date1:'',
+      date2:'',
       // 角色表格数据
       jsbList: [],
       // 弹出层标题
       title: "",
+      titles:"",
       // 是否显示弹出层
       open: false,
+      opens: false,
       ihitimage: false,
       // 是否显示弹出层（数据权限）
       openDataScope: false,
-	  menuExpand: false,
+	    menuExpand: false,
       menuNodeAll: false,
       deptExpand: true,
       deptNodeAll: false,
@@ -241,7 +338,7 @@ export default {
         }
       ],
 
-      options: [{
+     /* options: [{
         value: '花山区',
         label: '花山区'
       }, {
@@ -259,7 +356,7 @@ export default {
     }, {
         value: '和县',
         label: '和县'
-      }],
+      }],*/
 
       echartparam:[],
       echartparamx:[],
@@ -274,19 +371,31 @@ export default {
         pageNum: 1,
         pageSize: 20,
         Name: undefined,
-        sguardiancountry: []
+        sguardiancountry: [],
+        sguardianname: undefined,
       },
       // 表单参数
       form: {
-        sguardianname: '',
-        sno: '',
-        spatienttelephone: '',
-        sguardiantelephone: '',
-        ssymptomscode: '',
-        spsychosiscode: '',
-        ihit: '',
-        schargephysician: '',
-        region: ''
+        sguardianname: '', //患者姓名
+        sno: '',            //患者编号
+        sguardiancountry: '', //患者区地址
+        spatienttelephone: '', //患者电话
+        sguardiantelephone: '',  //监护人电话
+        ssymptomscode: '',   //精神症状代码
+        spsychosiscode: '',  //重症精神病症状代码
+        ihit: '',            //肇事次数
+        treatmenteffectcode: '', //既往治疗效果
+        sdoctoradvice: '', //医生意见
+        schargephysician: '',  //责任医师
+        sguardianprovince: '', //患者所在地-省
+        sguardiancity: '', //患者所在地-市
+      },
+
+      dataform: {
+        originTableName:'',
+        targetTableName:'',
+        startTime:'',
+        endTime:'',
       },
 
 
@@ -302,7 +411,16 @@ export default {
           { required: true, message: "患者姓名不能为空", trigger: "blur" }
         ],
         sno: [
-          { required: true, message: "患者不能为空", trigger: "blur" }
+          { required: true, message: "患者编号不能为空", trigger: "blur" }
+        ],
+        sguardiancountry: [
+          { required: true, message: "患者所在区不能为空", trigger: "blur" }
+        ],
+        treatmenteffectcode: [
+          { required: true, message: "既往治疗效果不能为空", trigger: "blur" }
+        ],
+        sdoctoradvice: [
+          { required: true, message: "医生意见不能为空", trigger: "blur" }
         ],
       }
     };
@@ -377,6 +495,14 @@ export default {
       this.ihitimage=false;
       this.reset();
     },
+
+    // 取消按钮(数据导入)
+    cancel1() {
+      this.opens = false;
+      this.ihitimage=false;
+      this.reset();
+    },
+
     // 取消按钮（数据权限）
     cancelDataScope() {
       this.openDataScope = false;
@@ -387,24 +513,29 @@ export default {
       if (this.$refs.menu != undefined) {
         this.$refs.menu.setCheckedKeys([]);
       }
-	  this.menuExpand = false,
+	    this.menuExpand = false,
       this.menuNodeAll = false,
       this.deptExpand = true,
       this.deptNodeAll = false,
       this.form = {
-        name: undefined,
-        idCardNo: undefined,
-        bmi: undefined,
-        bmi_Suggest: undefined,
-        arterial: undefined,
-        fastingGlucose: undefined,
-        drugName1: undefined,
-        doctor: undefined
+        sguardianname: undefined, //患者姓名
+        sno: undefined,            //患者编号
+        sguardiancountry: undefined, //患者区地址
+        spatienttelephone: undefined, //患者电话
+        sguardiantelephone: undefined,  //监护人电话
+        ssymptomscode: undefined,   //精神症状代码
+        spsychosiscode: undefined,  //重症精神病症状代码
+        ihit: undefined,            //肇事次数
+        treatmenteffectcode: undefined, //既往治疗效果
+        sdoctoradvice: undefined, //医生意见
+        schargephysician: undefined,  //责任医师
+        sguardianprovince: '安徽省', //患者所在地-省
+        sguardiancity: '马鞍山市' //患者所在地-市
       };
       this.resetForm("form");
     },
 
-    /** 按照地区统计患病信息*/
+/*    /!** 按照地区统计患病信息*!/
     countryCount() {
       return groupCountryPost(this.queryParams).then(response=>{
         this.echartparam=response.data;
@@ -444,7 +575,7 @@ export default {
           myChart.setOption(option);
         });
       })
-    },
+    },*/
 
     /** 搜索按钮操作 */
     handleQuery() {
@@ -493,10 +624,20 @@ export default {
         this.form.deptCheckStrictly = value ? true: false;
       }
     },
+
+
+    /** 导入按钮*/
+    handleImport(){
+      this.reset();
+      /* this.getMenuTreeselect();*/
+      this.opens = true;
+      this.titles = "患者信息批量导入";
+    },
+
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
-      //this.getMenuTreeselect();
+     /* this.getMenuTreeselect();*/
       this.open = true;
       this.title = "添加患者信息";
     },
@@ -516,35 +657,36 @@ export default {
       });
     },
 
+    /** 新增患者*/
     submitForm: function() {
-      this.$refs["form"].validate((valid) => {
+      this.$refs["form"].validate(valid => {
         if (valid) {
-          setTimeout(() =>{
-            this.msgSuccess("添加患者"+this.form.sguardianname+"成功");
+          addSufferer(this.form).then(response => {
+            this.msgSuccess("新增成功");
             this.open = false;
             this.getList();
-          },1050);
-        } else {
-          this.msgSuccess("添加患者"+this.form.sguardianname+"成功");
+       /*     if (response.code === 200) {
+              this.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            }*/
+          });
         }
       });
     },
 
-
-    /** 提交按钮（数据权限） */
-    submitDataScope: function() {
-      if (this.form.roleId != undefined) {
-        this.form.deptIds = this.getDeptAllCheckedKeys();
-        dataScope(this.form).then(response => {
-          if (response.code === 200) {
-            this.msgSuccess("修改成功");
-            this.openDataScope = false;
+    /** 导入数据*/
+    submitDataForm: function() {
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          importData(this.dataform).then(response => {
+            this.msgSuccess("插入数据成功");
+            this.opens = false;
             this.getList();
-          }
-        });
-      }
+          });
+        }
+      });
     },
-
 
     handleDelete() {
       const sno=this.sno;
@@ -594,7 +736,6 @@ export default {
       this.loading = true;
       listJsb(this.addDateRange(this.queryParams, this.dateRange)).then(
         response => {
-          //debugger
           this.jsbList = response.rows;
           this.total = response.total;
           this.loading = false;

@@ -2,24 +2,29 @@ package cn.ahut.controller;
 
 
 import cn.ahut.Mapper.JsbDataShow;
-import cn.ahut.entity.DictInfo;
-import cn.ahut.entity.FileDemo;
-import cn.ahut.entity.Jmpsychosispersoninfop;
-import cn.ahut.entity.Psychosispersoninfop;
+import cn.ahut.entity.*;
 import cn.ahut.entity.key.PrivateKey;
 import cn.ahut.entity.key.PublicKey;
 import cn.ahut.untils.BGNKey.get_PrivateKey;
 import cn.ahut.untils.BGNKey.get_PubilcKey;
 import cn.ahut.untils.BGNOp.DoDecrypt;
 import cn.ahut.untils.Get_Param;
+import cn.ahut.utils.Decrypt;
+import cn.ahut.utils.Encryption;
+import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
+import com.ruoyi.common.security.service.TokenService;
+import com.ruoyi.common.security.utils.SecurityUtils;
+import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.model.LoginUser;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1Pairing;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -39,13 +44,29 @@ public class JsbControllor extends BaseController {
     private get_PubilcKey get_pk;
     @Autowired
     private Get_Param get_Param;
+    @Autowired
+    Decrypt decrypt;
+    @Autowired
+    private TokenService tokenService;
+    @Autowired
+    private Encryption encryption;
 
     private PairingParameters param ;
 
     @GetMapping("/list")
-    public TableDataInfo list(Psychosispersoninfop psychosispersoninfop)
-    {
+    public TableDataInfo list(Psychosispersoninfop psychosispersoninfop) throws Exception {
         startPage();
+        LoginUser loginUser = tokenService.getLoginUser();
+        SysUser sysUser = loginUser.getSysUser(); //获取登录用户
+
+        if(sysUser.getAuthorityId()==1){ //有部分明文权限
+            List<Psychosispersoninfop> psychosispersoninfops = jsbDataShow.selectJsbByDoctorId(sysUser.getUserId()); //获取当前社区医生负录入的患者
+            List<Jmpsychosispersoninfop> list = new ArrayList<Jmpsychosispersoninfop>();
+            for(Psychosispersoninfop jsb:psychosispersoninfops){
+                list.add(decrypt.decryptJsb(jsb));
+            }
+            return getDataTable(list);
+        }
         List<Psychosispersoninfop> list = jsbDataShow.selectAllJsb(psychosispersoninfop);
         return getDataTable(list);
     }
@@ -122,4 +143,53 @@ public class JsbControllor extends BaseController {
         return getDataTable(list);
     }
 
+    /**
+     * 新增患者信息
+     * @param
+     */
+    @PostMapping("/sufferer")
+    public void add(@Validated @RequestBody PsychosispersoninfoTable psychosispersoninfoTable) throws Exception {
+        //获取录入医生信息
+        LoginUser loginUser = tokenService.getLoginUser();
+        SysUser sysUser = loginUser.getSysUser();
+
+        Psychosispersoninfop psy = new Psychosispersoninfop();
+        psy.setSno(psychosispersoninfoTable.getSno());
+        psy.setSguardianname(psychosispersoninfoTable.getSguardianname());
+        psy.setSguardianprovince(psychosispersoninfoTable.getSguardianprovince());
+        psy.setSguardiancity(psychosispersoninfoTable.getSguardiancity());
+        psy.setSguardiancountry(psychosispersoninfoTable.getSguardiancountry());
+        psy.setSguardiantelephone(psychosispersoninfoTable.getSguardiantelephone());
+        psy.setSpatienttelephone(psychosispersoninfoTable.getSpatienttelephone());
+        psy.setSdoctoradvice(psychosispersoninfoTable.getSdoctoradvice()); //医生建议
+        psy.setDoctorid(sysUser.getUserId());
+
+        psy.setSchargephysician(jsbDataShow.selectJsbByDoctorId(sysUser.getUserId()).get(0).getSchargephysician());
+
+        Integer ihit = Integer.valueOf(psychosispersoninfoTable.getIhit()); //肇事次数
+        psy.setIhit(encryption.doEncryption(ihit));
+
+        Integer ssymptomscode = Integer.valueOf(psychosispersoninfoTable.getSsymptomscode()); //精神病症状代码
+        psy.setSsymptomscode(encryption.doEncryption(ssymptomscode));
+
+        Integer spsychosiscode = Integer.valueOf(psychosispersoninfoTable.getSpsychosiscode()); //重症精神病症状代码
+        psy.setSpsychosiscode(encryption.doEncryption(spsychosiscode));
+
+        Integer treatmenteffectcode = Integer.valueOf(psychosispersoninfoTable.getTreatmenteffectcode());
+        psy.setTreatmenteffectcode(encryption.doEncryption(treatmenteffectcode));
+
+        jsbDataShow.insertJsb(psy);
+    }
+
+
+    @PostMapping("/dataimport")
+    public void importData(@Validated @RequestBody DataImport dataImport) throws Exception {
+        System.out.println(dataImport.getOriginTableName());
+        System.out.println(dataImport.getStartTime());
+        System.out.println(dataImport.getEndTime());
+
+        List<PsychosispersoninfoTable> allOriginInfo = jsbDataShow.getAllOriginInfo(dataImport);
+        PsychosispersoninfoTable psychosispersoninfoTable = allOriginInfo.get(0);
+        System.out.println(psychosispersoninfoTable.getIhit());
+    }
 }

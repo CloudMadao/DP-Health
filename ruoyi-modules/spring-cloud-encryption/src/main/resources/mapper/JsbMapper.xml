@@ -23,6 +23,7 @@
         <result property="treatmenteffectcode"           column="TREATMENTEFFECTCODE"              />
         <result property="ihit"           column="IHIT"              />
         <result property="sdoctoradvice"           column="SDOCTORADVICE"              />
+        <result property="doctorid" column="DOCTORID" />
     </resultMap>
 
     <resultMap id="Filetest" type="FileDemo">
@@ -44,6 +45,10 @@
                 SGUARDIANNAME = #{sguardianname}
             </if>
         </where>
+    </select>
+
+    <select id="selectJsbByDoctorId" resultMap="SysJsbResult" parameterType="long">
+        SELECT * FROM PSYCHOSISPERSONINFO Where DOCTORID=#{doctorId}
     </select>
 
     <delete id="deleteJsbBySno" parameterType="String">
@@ -78,4 +83,22 @@
         SELECT * FROM FILEDEMO
     </select>
 
+
+    <insert id="insertJsb" parameterType="Psychosispersoninfop">
+        insert into PSYCHOSISPERSONINFO ( SNO, SGUARDIANNAME,SGUARDIANPROVINCE, SGUARDIANCITY, SGUARDIANCOUNTRY,SGUARDIANTELEPHONE,
+        SPATIENTTELEPHONE, SCHARGEPHYSICIAN,SSYMPTOMSCODE,  SPSYCHOSISCODE,TREATMENTEFFECTCODE, IHIT,SDOCTORADVICE,DOCTORID
+        )
+        values (#{sno,jdbcType=VARCHAR}, #{sguardianname,jdbcType=VARCHAR},
+                #{sguardianprovince,jdbcType=VARCHAR}, #{sguardiancity,jdbcType=VARCHAR}, #{sguardiancountry,jdbcType=VARCHAR},
+                #{sguardiantelephone,jdbcType=VARCHAR},
+                #{spatienttelephone,jdbcType=VARCHAR}, #{schargephysician,jdbcType=VARCHAR},
+                #{ssymptomscode,jdbcType=BLOB}, #{spsychosiscode,jdbcType=BLOB},
+                #{treatmenteffectcode,jdbcType=BLOB}, #{ihit,jdbcType=BLOB},#{sdoctoradvice,jdbcType=VARCHAR},
+                #{doctorid})
+
+    </insert>
+
+    <select id="getAllOriginInfo" resultMap="SysJsbResult" parameterType="DataImport" >
+        SELECT * FROM #{originTableName}
+    </select>
 </mapper>

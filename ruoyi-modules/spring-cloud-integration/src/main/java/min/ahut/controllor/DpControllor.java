@@ -5,6 +5,7 @@ import min.ahut.domain.GroupEntity;
 import min.ahut.mapper.DpMapper;
 import min.ahut.utils.HistogramSort;
 import min.ahut.utils.NoiseMaker;
+import min.ahut.utils.NoiseModify;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,8 @@ public class DpControllor {
     NoiseMaker noiseMaker;
     @Autowired
     HistogramSort histogramSort;
+    @Autowired
+    NoiseModify noiseModify;
 
     /**
      *按县区对病人进行分组处理-原始数据
@@ -39,26 +42,32 @@ public class DpControllor {
     @PostMapping("/countrycount")
     public AjaxResult getCountFromCountryAddNoise(@RequestParam(value ="sguardiancountry",required = false) String...countryName){
         List<GroupEntity> countFromCountryByName = dpMapper.getCountFromCountryByName(countryName);
+        List<GroupEntity> sort = histogramSort.sort(countFromCountryByName);
 
-   /*     for(GroupEntity gp:countFromCountryByName){
-            double lpNoise = noiseMaker.getLpNoise(1, 1);
-            long noise = Math.round(lpNoise);
-            long result = (long)gp.getCount() + noise;
-
-            if(result<0){ //添加非负约束
-                gp.setCount(0);
-            }else {
-                gp.setCount(result);
-            }
-        }*/
-
-        for (GroupEntity gp:countFromCountryByName){
+        for (GroupEntity gp:sort){
             System.out.println(gp.getProperty()+"----"+gp.getCount());
         }
+        System.out.println("----------------------");
 
-        System.out.println("---------------------------");
+        sort.get(0).setCount(sort.get(0).getCount()+noiseModify.noiseModify(noiseMaker.getLpNoise(0.6,1))); //第一个元素加噪
+        for(int i=1;i<sort.size();){
+            double lpNoise1 = noiseMaker.getLpNoise(0.6, 1);
+            long noise1 = noiseModify.noiseModify(lpNoise1);
+            double lpNoise2 = noiseMaker.getLpNoise(0.6, 1);
+            long noise2 = noiseModify.noiseModify(lpNoise1);
 
-        List<GroupEntity> sort = histogramSort.sort(countFromCountryByName);
+            if(i==sort.size()-1&&sort.get(i).getCount()+noise1<=sort.get(i-1).getCount()){
+                sort.get(i).setCount(sort.get(i).getCount()+noise1);
+                break;
+            }
+            if(sort.get(i).getCount()+noise1<=sort.get(i-1).getCount()
+                    &&sort.get(i).getCount()+noise1>=sort.get(i+1).getCount()+noise2){
+                sort.get(i).setCount(sort.get(i).getCount()+noise1);
+                sort.get(i+1).setCount(sort.get(i+1).getCount()+noise2);
+                i+=2;
+            }
+
+        }
 
         for (GroupEntity gp:sort){
             System.out.println(gp.getProperty()+"----"+gp.getCount());

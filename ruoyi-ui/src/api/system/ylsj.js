@@ -9,6 +9,8 @@ export function listYlsj(query) {
   })
 }
 
+
+
 // 查询高血压患者列表
 export function listGxy(query) {
   return request({

@@ -1,36 +1,6 @@
 <template>
   <div class="app-container">
     <el-row :gutter="10" class="mb8">
-      <div id="main" class="pie-class" :style="{width: '600px', height: '400px' }"/>
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-        >新增</el-button>
-      </el-col>
-
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-        >解密</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-        >删除</el-button>
-      </el-col>
-
-
       <el-col :span="1.5">
         <el-dropdown trigger="click" :hide-on-click="false">
           <el-button type="warning" size="mini" >
@@ -61,28 +31,9 @@
           </el-dropdown-menu>
         </el-dropdown>
       </el-col>
-
-
+      <div id="main" class="pie-class" :style="{width: '1600px', height: '800px' }"/>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
-
-
-    <el-table v-loading="loading" :data="jsbList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <!--<el-table-column label="患者编号" prop="sno" :show-overflow-tooltip="true"  />-->
-      <el-table-column label="患者姓名" prop="sguardianname" :show-overflow-tooltip="true"  />
-      <el-table-column label="患者地址(省)" prop="sguardianprovince" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="患者地址(市)" prop="sguardiancity" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="患者地址(县)" prop="sguardiancountry" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="监护人电话" prop="sguardiantelephone" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="患者电话" prop="spatienttelephone" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="责任医生" prop="schargephysician" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="精神病症状" prop="ssymptomscode" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="重症精神病症状" prop="spsychosiscode" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="既往治疗效果" prop="treatmenteffectcode" :show-overflow-tooltip="true" width="150"/>
-      <el-table-column label="肇事次数" prop="ihit" :show-overflow-tooltip="true" width="150" />
-    </el-table>
-
 
     <pagination
       v-show="total>0"
@@ -91,86 +42,6 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <!-- 添加或修改角色配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="130px">
-        <el-form-item label="患者姓名" prop="sguardianname">
-          <el-input v-model="form.sguardianname" placeholder="请输入患者名称" />
-        </el-form-item>
-        <el-form-item label="患者编号" prop="sno">
-          <el-input v-model="form.sno" placeholder="请输入患者编号" />
-        </el-form-item>
-        <el-form-item label="患者电话" prop="spatienttelephone">
-          <el-input v-model="form.spatienttelephone"  />
-        </el-form-item>
-        <el-form-item label="监护人电话" prop="sguardiantelephone">
-          <el-input v-model="form.sguardiantelephone" />
-        </el-form-item>
-        <el-form-item label="精神病症状代码" prop="ssymptomscode">
-          <el-input v-model="form.ssymptomscode"  />
-        </el-form-item>
-        <el-form-item label="重症精神病代码" prop="spsychosiscode">
-          <el-input v-model="form.spsychosiscode"  />
-        </el-form-item>
-        <el-form-item label="肇事次数" prop="ihit">
-          <el-input v-model="form.ihit" />
-        </el-form-item>
-        <el-form-item label="责任医生" prop="schargephysician">
-          <el-input v-model="form.schargephysician" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 分配角色数据权限对话框 -->
-    <el-dialog :title="title" :visible.sync="openDataScope" width="500px" append-to-body>
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="角色名称">
-          <el-input v-model="form.roleName" :disabled="true" />
-        </el-form-item>
-        <el-form-item label="权限字符">
-          <el-input v-model="form.roleKey" :disabled="true" />
-        </el-form-item>
-        <el-form-item label="权限范围">
-          <el-select v-model="form.dataScope">
-            <el-option
-              v-for="item in dataScopeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="数据权限" v-show="form.dataScope == 2">
-          <el-checkbox v-model="deptExpand" @change="handleCheckedTreeExpand($event, 'dept')">展开/折叠</el-checkbox>
-          <el-checkbox v-model="deptNodeAll" @change="handleCheckedTreeNodeAll($event, 'dept')">全选/全不选</el-checkbox>
-          <el-checkbox v-model="form.deptCheckStrictly" @change="handleCheckedTreeConnect($event, 'dept')">父子联动</el-checkbox>
-          <el-tree
-            class="tree-border"
-            :data="deptOptions"
-            show-checkbox
-            default-expand-all
-            ref="dept"
-            node-key="id"
-            :check-strictly="!form.deptCheckStrictly"
-            empty-text="加载中，请稍后"
-            :props="defaultProps"
-          ></el-tree>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitDataScope">确 定</el-button>
-        <el-button @click="cancelDataScope">取 消</el-button>
-      </div>
-    </el-dialog>
-
-    <div>
-      <div id="report" style="width: 1000px;height: 400px;"></div>
-    </div>
   </div>
 </template>
 

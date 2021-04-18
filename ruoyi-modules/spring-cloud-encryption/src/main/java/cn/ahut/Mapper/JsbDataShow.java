@@ -1,9 +1,7 @@
 package cn.ahut.Mapper;
 
 
-import cn.ahut.entity.DictInfo;
-import cn.ahut.entity.FileDemo;
-import cn.ahut.entity.Psychosispersoninfop;
+import cn.ahut.entity.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +20,8 @@ public interface JsbDataShow {
      * @return
      */
     List<Psychosispersoninfop> selectAllJsb(Psychosispersoninfop psychosispersoninfop);
+
+    List<Psychosispersoninfop> selectJsbByDoctorId(Long doctorId);
 
     /**
      * 按照患者编号删除患者信息
@@ -54,4 +54,16 @@ public interface JsbDataShow {
      * 获取文件信息
      */
     List<FileDemo> selectAllFile();
+
+    /**
+     * 插入精神病患者
+     */
+    void insertJsb(Psychosispersoninfop psychosispersoninfop);
+
+
+    /**
+     * 获取源数据表单信息
+     */
+    List<PsychosispersoninfoTable> getAllOriginInfo(DataImport dataImport);
+
 }

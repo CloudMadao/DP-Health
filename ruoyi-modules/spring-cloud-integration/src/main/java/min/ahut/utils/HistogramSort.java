@@ -23,19 +23,14 @@ public class HistogramSort {
 
         GroupEntity temp = new GroupEntity();
 
-        //对原始直方图进行冒泡排序，获得从大至小的原始直方图
+        //对原始直方图进行冒泡排序，获得非升序原始直方图
         for(int i=0;i<histogram.size()-1;i++){
-            boolean flag = false;
             for(int j=0;j<histogram.size()-1-i;j++){
                 if(histogram.get(j+1).getCount()>histogram.get(j).getCount()){
-                    temp=histogram.get(j+1);
+                    temp=histogram.get(j);
                     histogram.set(j,histogram.get(j+1));
                     histogram.set(j+1,temp);
-                    flag=true;
                 }
-            }
-            if(flag==true){
-                break;
             }
         }
         return histogram;

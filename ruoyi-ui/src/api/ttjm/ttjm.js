@@ -18,6 +18,23 @@ export function delJsb(sno) {
 }
 
 
+//增加患者信息
+export function addSufferer(data) {
+  return request({
+    url: '/ttjm/jsb/sufferer',
+    method: 'post',
+    data: data
+  })
+}
+
+//导入原始数据
+export function importData(data) {
+  return request({
+    url: '/ttjm/jsb/dataimport',
+    method: 'post',
+    data: data
+  })
+}
 
 
 // 解密精神病患者信息

@@ -16,3 +16,4 @@ export function groupCountryPost(query) {
     params: query
   })
 }
+

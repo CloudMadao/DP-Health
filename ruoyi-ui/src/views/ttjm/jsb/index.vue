@@ -216,9 +216,6 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <div style="font-size: 14px;color: #A8A8A8 ">
-      查询到47条数据，耗时约2s
-    </div>
 
      <el-table v-loading="loading" :data="jsbList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
@@ -263,6 +260,7 @@
         <el-form-item label="精神病症状代码" prop="ssymptomscode">
           <el-input v-model="form.ssymptomscode"  />
         </el-form-item>
+
         <el-form-item label="重症精神病代码" prop="spsychosiscode">
           <el-input v-model="form.spsychosiscode"  />
         </el-form-item>

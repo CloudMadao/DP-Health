@@ -48,7 +48,23 @@ public class Psychosispersoninfop {
 
     private byte[] iattemptedsuicide;
 
+    private long doctorid;
 
+    public long getDoctorid() {
+        return doctorid;
+    }
+
+    public void setDoctorid(long doctorid) {
+        this.doctorid = doctorid;
+    }
+
+    public Psychosispersoninfop(String sno, String sguardianname) {
+        this.sno = sno;
+        this.sguardianname = sguardianname;
+    }
+
+    public Psychosispersoninfop() {
+    }
 
     public byte[] getIfirstdiseaseage() {
         return ifirstdiseaseage;

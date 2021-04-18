@@ -91,6 +91,19 @@ public class SysUser extends BaseEntity
     /** 岗位组 */
     private Long[] postIds;
 
+    /** 自设权限id (1部分明文，其余全密文) */
+    private int authorityId;
+
+
+
+    public int getAuthorityId() {
+        return authorityId;
+    }
+
+    public void setAuthorityId(int authorityId) {
+        this.authorityId = authorityId;
+    }
+
     public SysUser()
     {
 
