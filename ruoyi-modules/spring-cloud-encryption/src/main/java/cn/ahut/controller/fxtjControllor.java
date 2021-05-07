@@ -85,11 +85,11 @@ public class fxtjControllor extends BaseController {
                 tj = jsbop.zshangcs(date1, date2);
 
             }
-            if(c2.equals("自杀次数")){
+    /*        if(c2.equals("自杀次数")){
 
                 tj = jsbop.zshacs(date1, date2);
 
-            }
+            }*/
         }
         return    AjaxResult.success(tj);
 

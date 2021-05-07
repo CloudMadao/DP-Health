@@ -11,12 +11,10 @@ import cn.ahut.untils.BGNOp.DoDecrypt;
 import cn.ahut.untils.Get_Param;
 import cn.ahut.utils.Decrypt;
 import cn.ahut.utils.Encryption;
-import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.common.security.service.TokenService;
-import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
 import it.unisa.dia.gas.jpbc.Element;
@@ -53,19 +51,30 @@ public class JsbControllor extends BaseController {
 
     private PairingParameters param ;
 
+
     @GetMapping("/list")
     public TableDataInfo list(Psychosispersoninfop psychosispersoninfop) throws Exception {
         startPage();
         LoginUser loginUser = tokenService.getLoginUser();
         SysUser sysUser = loginUser.getSysUser(); //获取登录用户
 
-        if(sysUser.getAuthorityId()==1){ //有部分明文权限
-            List<Psychosispersoninfop> psychosispersoninfops = jsbDataShow.selectJsbByDoctorId(sysUser.getUserId()); //获取当前社区医生负录入的患者
-            List<Jmpsychosispersoninfop> list = new ArrayList<Jmpsychosispersoninfop>();
-            for(Psychosispersoninfop jsb:psychosispersoninfops){
-                list.add(decrypt.decryptJsb(jsb));
+        if(sysUser.getSwitchs()==1) {
+            if (sysUser.getAuthorityId() == 1) { //有部分明文权限
+                List<Psychosispersoninfop> psychosispersoninfops = jsbDataShow.selectJsbByDoctorId(sysUser.getUserId()); //获取当前社区医生负录入的患者
+                List<Jmpsychosispersoninfop> list = new ArrayList<Jmpsychosispersoninfop>();
+                for (Psychosispersoninfop jsb : psychosispersoninfops) {
+                    list.add(decrypt.decryptJsb(jsb));
+                }
+                return getDataTable(list);
             }
-            return getDataTable(list);
+            if (sysUser.getAuthorityId() == 2) { //有部分明文权限
+                List<Psychosispersoninfop> psychosispersoninfops = jsbDataShow.selectAllJsb(psychosispersoninfop);
+                List<Jmpsychosispersoninfop> list = new ArrayList<Jmpsychosispersoninfop>();
+                for (Psychosispersoninfop jsb : psychosispersoninfops) {
+                    list.add(decrypt.decryptJsb(jsb));
+                }
+                return getDataTable(list);
+            }
         }
         List<Psychosispersoninfop> list = jsbDataShow.selectAllJsb(psychosispersoninfop);
         return getDataTable(list);
@@ -123,8 +132,9 @@ public class JsbControllor extends BaseController {
         DictInfo dictInfo3 = jsbDataShow.selectByZlCode(m3);
         jmpsychosispersoninfop.setTreatmenteffectcode(dictInfo3.getDmsm());
 
-        Element element4=pairing.getG1().newElementFromBytes(psychosispersoninfop.getIfirstdiseaseage());//首次发病
-        int m4 = DoDecrypt.decrypt(element4, pk, sk);
+       /* Element element4=pairing.getG1().newElementFromBytes(psychosispersoninfop.getIfirstdiseaseage());//首次发病
+        int m4 = DoDecrypt.decrypt(element4, pk, sk);*/
+
         jmpsychosispersoninfop.setIfirstdiseaseage("");
         jmpsychosispersoninfop.setDfilltime(psychosispersoninfop.getDfilltime());
         jmpsychosispersoninfop.setIhospitalizations("");
@@ -182,6 +192,9 @@ public class JsbControllor extends BaseController {
     }
 
 
+    /**
+     *明文数据加密后导入数据库
+     */
     @PostMapping("/dataimport")
     public void importData(@Validated @RequestBody DataImport dataImport) throws Exception {
         System.out.println(dataImport.getOriginTableName());
@@ -191,5 +204,20 @@ public class JsbControllor extends BaseController {
         List<PsychosispersoninfoTable> allOriginInfo = jsbDataShow.getAllOriginInfo(dataImport);
         PsychosispersoninfoTable psychosispersoninfoTable = allOriginInfo.get(0);
         System.out.println(psychosispersoninfoTable.getIhit());
+    }
+
+
+    @GetMapping("/{sno}")
+    public AjaxResult getJsbInfo(@PathVariable String sno) throws Exception {
+        AjaxResult ajax = AjaxResult.success();
+        Psychosispersoninfop psychosispersoninfop = jsbDataShow.selectOneBySno(sno);
+        Jmpsychosispersoninfop jmpsychosispersoninfop = decrypt.decryptJsb(psychosispersoninfop);
+        ajax.put("data",jmpsychosispersoninfop);
+        return ajax;
+    }
+
+    @PostMapping("/updateSufferer")
+    public void update(@Validated @RequestBody Psychosispersoninfop psychosispersoninfop) throws Exception {
+
     }
 }

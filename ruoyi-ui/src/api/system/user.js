@@ -70,6 +70,19 @@ export function changeUserStatus(userId, status) {
   })
 }
 
+//用户权限开关
+export function changeSwitch(userId, switchs) {
+  const data = {
+    userId,
+    switchs,
+  }
+  return request({
+    url: '/system/user/changeSwitchs',
+    method: 'put',
+    data: data
+  })
+}
+
 // 查询用户个人信息
 export function getUserProfile() {
   return request({

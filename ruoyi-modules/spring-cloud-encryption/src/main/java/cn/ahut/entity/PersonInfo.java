@@ -45,7 +45,17 @@ public class PersonInfo {
 
     private byte[] ihit;
     private byte[] isuicide ;
-    private byte[] iattemptedsuicide;
+
+
+    private String doctorid;
+
+    public String getDoctorid() {
+        return doctorid;
+    }
+
+    public void setDoctorid(String doctorid) {
+        this.doctorid = doctorid;
+    }
 
     public byte[] getIsuicide() {
         return isuicide;
@@ -55,13 +65,6 @@ public class PersonInfo {
         this.isuicide = isuicide;
     }
 
-    public byte[] getIattemptedsuicide() {
-        return iattemptedsuicide;
-    }
-
-    public void setIattemptedsuicide(byte[] iattemptedsuicide) {
-        this.iattemptedsuicide = iattemptedsuicide;
-    }
 
     public byte[] getIfirstdiseaseage() {
         return ifirstdiseaseage;

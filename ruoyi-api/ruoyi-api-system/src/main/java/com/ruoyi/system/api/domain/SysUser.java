@@ -91,10 +91,20 @@ public class SysUser extends BaseEntity
     /** 岗位组 */
     private Long[] postIds;
 
-    /** 自设权限id (1部分明文，其余全密文) */
+    /** 自设权限id (1部分明文，2全明文，其余全密文) */
     private int authorityId;
 
+    /** 权限开关 (1代表开启权限，0代表关闭权限) */
+    private int switchs;
 
+
+    public int getSwitchs() {
+        return switchs;
+    }
+
+    public void setSwitchs(int switchs) {
+        this.switchs = switchs;
+    }
 
     public int getAuthorityId() {
         return authorityId;

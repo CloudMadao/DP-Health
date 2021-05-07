@@ -140,7 +140,8 @@
           <el-table-column label="用户昵称" align="center" prop="nickName" :show-overflow-tooltip="true" />
           <el-table-column label="部门" align="center" prop="dept.deptName" :show-overflow-tooltip="true" />
           <el-table-column label="手机号码" align="center" prop="phonenumber" width="120" />
-          <el-table-column label="状态" align="center">
+
+<!--          <el-table-column label="状态" align="center">
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.status"
@@ -149,7 +150,20 @@
                 @change="handleStatusChange(scope.row)"
               ></el-switch>
             </template>
+          </el-table-column>-->
+
+          <el-table-column label="权限状态" align="center">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.switchs"
+                active-value="1"
+                inactive-value="0"
+                @change="handleAuthorityIdChange(scope.row)"
+              ></el-switch>
+            </template>
           </el-table-column>
+
+
           <el-table-column label="创建时间" align="center" prop="createTime" width="160">
             <template slot-scope="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -263,19 +277,17 @@
           </el-col>
         </el-row>
         <el-row>
-<!--          <el-col :span="12">-->
-<!--            <el-form-item label="岗位">-->
-<!--              <el-select v-model="form.postIds" multiple placeholder="请选择">-->
-<!--                <el-option-->
-<!--                  v-for="item in postOptions"-->
-<!--                  :key="item.postId"-->
-<!--                  :label="item.postName"-->
-<!--                  :value="item.postId"-->
-<!--                  :disabled="item.status == 1"-->
-<!--                ></el-option>-->
-<!--              </el-select>-->
-<!--            </el-form-item>-->
-<!--          </el-col>-->
+
+          <el-col :span="12">
+            <el-form-item label="数据权限">
+              <el-select v-model="form.authorityId"  placeholder="请选择">
+                <el-option label="社区医生" value="1"></el-option>
+                <el-option label="卫健委" value="2"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+
           <el-col :span="12">
             <el-form-item label="角色">
               <el-select v-model="form.roleIds" multiple placeholder="请选择">
@@ -338,7 +350,16 @@
 </template>
 
 <script>
-  import {addUser, changeUserStatus, delUser, getUser, listUser, resetUserPwd, updateUser} from "@/api/system/user";
+import {
+  addUser,
+  changeSwitch,
+  changeUserStatus,
+  delUser,
+  getUser,
+  listUser,
+  resetUserPwd,
+  updateUser
+} from "@/api/system/user";
   import {getToken} from "@/utils/auth";
   import {treeselect} from "@/api/system/dept";
   import Treeselect from "@riophae/vue-treeselect";
@@ -384,7 +405,10 @@
       // 角色选项
       roleOptions: [],
       // 表单参数
-      form: {},
+      form: {
+        authorityId: '',
+        switchs:'',
+      },
       defaultProps: {
         children: "children",
         label: "label"
@@ -492,6 +516,24 @@
       this.queryParams.deptId = data.id;
       this.getList();
     },
+
+    //用户权限开关修改
+    handleAuthorityIdChange(row){
+      let text = row.switchs === "1" ? "启用" : "停用";
+      this.$confirm('确认要"' + text + '""' + row.userName + '"用户权限吗?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return changeSwitch(row.userId, row.switchs);
+      }).then(() => {
+        this.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.switchs = row.switchs === "1" ? "0" : "1";
+      });
+    },
+
+
     // 用户状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
@@ -526,7 +568,9 @@
         status: "0",
         remark: undefined,
         postIds: [],
-        roleIds: []
+        roleIds: [],
+        authorityId: undefined,
+        switchs: undefined
       };
       this.resetForm("form");
     },

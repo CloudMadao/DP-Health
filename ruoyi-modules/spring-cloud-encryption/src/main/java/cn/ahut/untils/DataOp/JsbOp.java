@@ -273,7 +273,7 @@ public class JsbOp {
      * @return
      * @throws Exception
      */
-    public Map<String,String> zshacs(Date d1, Date d2) throws Exception{
+    /*public Map<String,String> zshacs(Date d1, Date d2) throws Exception{
         param=get_Param.getparam();
         PrivateKey sk=get_sk.createsk(get_Param.getparam());
         PublicKey pk=get_pk.createpk(get_Param.getparam());
@@ -343,5 +343,5 @@ public class JsbOp {
             }
         }
         return map;
-    }
+    }*/
 }

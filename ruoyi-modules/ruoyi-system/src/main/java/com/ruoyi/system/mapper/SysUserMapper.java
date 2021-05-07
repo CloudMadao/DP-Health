@@ -53,6 +53,9 @@ public interface SysUserMapper
      */
     public int updateUser(SysUser user);
 
+
+
+
     /**
      * 修改用户头像
      * 

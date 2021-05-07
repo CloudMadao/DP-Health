@@ -16,9 +16,9 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-<!--    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="mb8">
 
-&lt;!&ndash;      <el-col :span="1.5">
+      <el-col :span="1.5">
         <el-button
           type="primary"
           icon="el-icon-plus"
@@ -29,21 +29,32 @@
 
       <el-col :span="1.5">
         <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-        >解密</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
           type="danger"
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
         >删除</el-button>
+      </el-col>
+
+<!--      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+        >解密</el-button>
+      </el-col>-->
+
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleModify"
+        >修改</el-button>
       </el-col>
 
       <el-col :span="1.5">
@@ -53,41 +64,9 @@
           size="mini"
           @click="handleImport"
         >导入</el-button>
-      </el-col>&ndash;&gt;
-
-
-      &lt;!&ndash;      <el-col :span="1.5">
-              <el-dropdown trigger="click" :hide-on-click="false">
-                <el-button type="warning" size="mini" >
-                  信息统计<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>
-                    <el-form :model="queryParams.sguardiancountry"  :inline="true">
-
-                      <el-form-item label="患者地址" prop="sguardiancountry">
-                        <el-select v-model="queryParams.sguardiancountry"  placeholder="请选择县区">
-                          <el-option
-                            v-for="item in options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                          </el-option>
-                        </el-select>
-                      </el-form-item>
-
-                      <el-form-item>
-                        <el-button type="cyan" icon="el-icon-search" size="mini" @click="countryCount">统计</el-button>
-                      </el-form-item>
-                    </el-form>
-                  </el-dropdown-item>
-      &lt;!&ndash;            <el-dropdown-item>黄金糕</el-dropdown-item>
-                  <el-dropdown-item>狮子头</el-dropdown-item>&ndash;&gt;
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-col>&ndash;&gt;
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>-->
+    </el-row>
 
 
      <el-table v-loading="loading" :data="jsbList" @selection-change="handleSelectionChange">
@@ -221,6 +200,75 @@
       </div>
     </el-dialog>
 
+    <!-- 修改患者信息 -->
+    <el-dialog :title="title" :visible.sync="openhz" width="500px" append-to-body>
+      <el-form ref="form" :model="modifyform" :rules="rules" label-width="150px">
+        <el-form-item label="患者姓名" prop="sguardianname">
+          <el-input v-model="modifyform.sguardianname" placeholder="请输入患者名称" />
+        </el-form-item>
+        <el-form-item label="患者县区地址" prop="sguardiancountry">
+          <el-input v-model="modifyform.sguardiancountry" placeholder="请输入患者县区地址" />
+        </el-form-item>
+        <el-form-item label="监护人电话" prop="sguardiantelephone">
+          <el-input v-model="modifyform.sguardiantelephone" />
+        </el-form-item>
+        <el-form-item label="患者电话" prop="spatienttelephone">
+          <el-input v-model="modifyform.spatienttelephone"  />
+        </el-form-item>
+
+        <el-form-item label="肇事次数" prop="ihit">
+          <el-input v-model="modifyform.ihit" />
+        </el-form-item>
+
+        <el-form-item label="精神病症状" prop="ssymptomscode">
+          <el-select v-model="modifyform.ssymptomscode" placeholder="请选择患者精神病症状">
+            <el-option label="幻觉" value="01"></el-option>
+            <el-option label="交流困难" value="02"></el-option>
+            <el-option label="猜疑" value="03"></el-option>
+            <el-option label="喜怒无常" value="04"></el-option>
+            <el-option label="行为怪异" value="05"></el-option>
+            <el-option label="兴奋话多" value="06"></el-option>
+            <el-option label="伤人毁物" value="07"></el-option>
+            <el-option label="悲观厌世" value="08"></el-option>
+            <el-option label="无故外走" value="09"></el-option>
+            <el-option label="自语自笑" value="10"></el-option>
+            <el-option label="孤僻懒散" value="11"></el-option>
+            <el-option label="其他" value="99"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="重症精神病症状" prop="spsychosiscode">
+          <el-select v-model="modifyform.spsychosiscode" placeholder="请选择患者重症精神病症状">
+            <el-option label="精神分裂症" value="1"></el-option>
+            <el-option label="分裂情感性障碍" value="2"></el-option>
+            <el-option label="偏执性精神病" value="3"></el-option>
+            <el-option label="双向障碍" value="4"></el-option>
+            <el-option label="癫痫所致精神障碍" value="5"></el-option>
+            <el-option label="精神发育迟滞伴发精神障碍" value="6"></el-option>
+            <el-option label="其他" value="9"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="既往治疗效果" prop="treatmenteffectcode">
+          <el-select v-model="modifyform.treatmenteffectcode" placeholder="请选择患者既往治疗效果">
+            <el-option label="治愈" value="1"></el-option>
+            <el-option label="好转" value="2"></el-option>
+            <el-option label="稳定" value="3"></el-option>
+            <el-option label="恶化" value="4"></el-option>
+            <el-option label="死亡" value="5"></el-option>
+            <el-option label="其他" value="9"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="医生意见" prop="sdoctoradvice">
+          <el-input v-model="modifyform.sdoctoradvice" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitModifyForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
 
     <div>
       <div id="report" style="width: 1000px;height: 400px;"></div>
@@ -232,7 +280,8 @@
 import {changeRoleStatus, getRole} from "@/api/system/role";
 import {roleMenuTreeselect, treeselect as menuTreeselect} from "@/api/system/menu";
 import {roleDeptTreeselect, treeselect as deptTreeselect} from "@/api/system/dept";
-import {addSufferer, delJsb, importData, jmJsb, listJsb} from "@/api/ttjm/ttjm";
+import {addSufferer, delJsb, importData, jmJsb, listJsb, listOne} from "@/api/ttjm/ttjm";
+import {getUser} from "@/api/system/user";
 
 
 export default {
@@ -263,6 +312,7 @@ export default {
       // 是否显示弹出层
       open: false,
       opens: false,
+      openhz: false,
       ihitimage: false,
       // 是否显示弹出层（数据权限）
       openDataScope: false,
@@ -298,26 +348,6 @@ export default {
         }
       ],
 
-     /* options: [{
-        value: '花山区',
-        label: '花山区'
-      }, {
-      value: '雨山区',
-        label: '雨山区'
-    }, {
-      value: '博望区',
-        label: '博望区'
-    }, {
-      value: '当涂县',
-        label: '当涂县'
-    }, {
-      value: '含山县',
-        label: '含山县'
-    }, {
-        value: '和县',
-        label: '和县'
-      }],*/
-
       echartparam:[],
       echartparamx:[],
       echartparamy:[],
@@ -326,6 +356,9 @@ export default {
       menuOptions: [],
       // 部门列表
       deptOptions: [],
+
+      sguardianname:'',
+
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -356,6 +389,21 @@ export default {
         targetTableName:'',
         startTime:'',
         endTime:'',
+      },
+
+      modifyform:{
+        sguardianname: '', //患者姓名
+        sguardiancountry: '', //患者区地址
+        spatienttelephone: '', //患者电话
+        sguardiantelephone: '',  //监护人电话
+        ssymptomscode: '',   //精神症状代码
+        spsychosiscode: '',  //重症精神病症状代码
+        ihit: '',            //肇事次数
+        treatmenteffectcode: '', //既往治疗效果
+        sdoctoradvice: '', //医生意见
+        schargephysician: '',  //责任医师
+        sguardianprovince: '', //患者所在地-省
+        sguardiancity: '', //患者所在地-市
       },
 
 
@@ -588,19 +636,55 @@ export default {
 
     /** 导入按钮*/
     handleImport(){
-      this.reset();
-      /* this.getMenuTreeselect();*/
-      this.opens = true;
-      this.titles = "患者信息批量导入";
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else {
+        this.reset();
+        /* this.getMenuTreeselect();*/
+        this.opens = true;
+        this.titles = "患者信息批量导入";
+      }
     },
 
-    /** 新增按钮操作 */
-    handleAdd() {
+
+    /** 修改按钮*/
+    handleModify(data) {
       this.reset();
-     /* this.getMenuTreeselect();*/
-      this.open = true;
-      this.title = "添加患者信息";
+      this.openhz=true;
+      const sno=this.sno;
+      listOne(sno).then(response=>{
+        this.form.sguardianname=response.data[2];
+      })
+
+      this.title="修改患者信息"
+   /*   const userId = row.userId || this.ids;
+      getUser(userId).then(response => {
+        this.form = response.data;
+        this.postOptions = response.posts;
+        this.roleOptions = response.roles;
+        this.form.postIds = response.postIds;
+        this.form.roleIds = response.roleIds;
+        this.open = true;
+        this.title = "修改用户";
+        this.form.password = "";
+      });*/
     },
+
+    handleAdd() {
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else{
+        this.reset();
+        /* this.getMenuTreeselect();*/
+        this.open = true;
+        this.title = "添加患者信息";
+      }
+    },
+
     /** 分配数据权限操作 */
     handleDataScope(row) {
       this.reset();
@@ -619,17 +703,25 @@ export default {
 
     /** 新增患者*/
     submitForm: function() {
+        this.$refs["form"].validate(valid => {
+          if (valid) {
+            addSufferer(this.form).then(response => {
+              this.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            });
+          }
+        });
+    },
+
+    /** 修改患者信息*/
+    submitModifyForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
           addSufferer(this.form).then(response => {
             this.msgSuccess("新增成功");
             this.open = false;
             this.getList();
-       /*     if (response.code === 200) {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            }*/
           });
         }
       });
@@ -649,35 +741,47 @@ export default {
     },
 
     handleDelete() {
-      const sno=this.sno;
-      this.$confirm('是否确认删除身份证号为"' + sno + '"的数据项?', "警告", {
-        distinguishCancelAndClose: true,
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: "warning"
-      })
-        .then(() => {
-          return delJsb(sno);
-        })
-        .then(()=>{
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
-        .catch(()=>{
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else {
+       const sno=this.sno;
+       this.$confirm('是否确认删除编号为"' + sno + '"的患者信息?', "警告", {
+         distinguishCancelAndClose: true,
+         confirmButtonText: '确定',
+         cancelButtonText: '取消',
+         type: "warning"
+       })
+         .then(() => {
+           return delJsb(sno);
+         })
+         .then(()=>{
+           this.getList();
+           this.msgSuccess("删除成功");
+         })
+         .catch(()=>{
 
-        });
+         });
+     }
     },
     /** 解密按钮操作 */
     handleUpdate() {
-      const sno=this.sno;
-      jmJsb(sno).then(
-        response => {
-          //debugger
-          this.jsbList = response.rows;
-          this.total = response.total;
-          this.loading = false;
-        }
-      );
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else{
+       const sno=this.sno;
+       jmJsb(sno).then(
+         response => {
+           //debugger
+           this.jsbList = response.rows;
+           this.total = response.total;
+           this.loading = false;
+         }
+       );
+     }
     },
 
     showimage(){

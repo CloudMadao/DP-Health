@@ -90,7 +90,7 @@ public class test {
 
 
         Map_list_code mlc= new Map_list_code();
-        for(int i=1;i<5000;i++){
+        for(int i=1;i<100000;i++){
             PersonInfo person =new PersonInfo();
             person.setSguardianname(NameBuilder.build());
             person.setSno(i+"");
@@ -150,12 +150,12 @@ public class test {
             sucideMap= Map_list_code.code_sno(int_sucide,sucideMap,i+"");
             person.setIsuicide(sucide.toBytes());
 
-            //自杀次数
+          /*  //自杀次数
             int int_attempt= random.nextInt(4) + 1;
             Element attempt= DoEncrypt.encrypt(int_attempt,pk);
             attemptMap= Map_list_code.code_sno(int_attempt,attemptMap,i+"");
             person.setIattemptedsuicide(attempt.toBytes());
-            mapper.addPerson(person);
+            mapper.addPerson(person);*/
 
         }
         System.out.println("结束"+System.currentTimeMillis());

@@ -26,6 +26,30 @@
         <result property="doctorid" column="DOCTORID" />
     </resultMap>
 
+    <resultMap type="PsychosispersoninfoTable" id="OriginJsbData">
+        <result property="skey"             column="sKEY"                />
+        <result property="sno"         column="SNO"            />
+        <result property="sguardianname"              column="SGUARDIANNAME"                 />
+        <result property="sguardianprovince"      column="SGUARDIANPROVINCE"         />
+        <result property="sguardiancity"         column="SGUARDIANCITY"            />
+        <result property="sguardiancountry"   column="SGUARDIANCOUNTRY"      />
+        <result property="sguardianvillage"        column="SGUARDIANVILLAGE"           />
+        <result property="sguardianhouseno"       column="SGUARDIANHOUSENO"          />
+        <result property="sguardiantelephone"      column="SGUARDIANTELEPHONE"         />
+        <result property="spatienttelephone"         column="SPATIENTTELEPHONE"            />
+        <result property="schargephysician"           column="SCHARGEPHYSICIAN"              />
+        <result property="sfirstdiseasetime"           column="SFIRSTDISEASETIME"              />
+        <result property="dfilltime"           column="DFILLTIME"              />
+        <result property="ifirstdiseaseage"           column="IFIRSTDISEASEAGE"              />
+        <result property="ssymptomscode"           column="SSYMPTOMSCODE"              />
+        <result property="ihospitalizations"           column="IHOSPITALIZATIONS"              />
+        <result property="spsychosiscode"           column="SPSYCHOSISCODE"              />
+        <result property="treatmenteffectcode"           column="TREATMENTEFFECTCODE"              />
+        <result property="ihit"           column="IHIT"              />
+        <result property="sdoctoradvice"           column="SDOCTORADVICE"              />
+        <result property="doctorid" column="DOCTORID" />
+    </resultMap>
+
     <resultMap id="Filetest" type="FileDemo">
         <result property="name"             column="NAME"                />
         <result property="ctName"             column="CTNAME"                />
@@ -98,7 +122,7 @@
 
     </insert>
 
-    <select id="getAllOriginInfo" resultMap="SysJsbResult" parameterType="DataImport" >
-        SELECT * FROM #{originTableName}
+    <select id="getAllOriginInfo" resultMap="OriginJsbData" parameterType="DataImport" statementType="STATEMENT">
+        SELECT * FROM ${originTableName}
     </select>
 </mapper>

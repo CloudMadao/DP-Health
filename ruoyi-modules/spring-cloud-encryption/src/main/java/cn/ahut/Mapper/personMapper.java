@@ -1,6 +1,7 @@
 package cn.ahut.Mapper;
 
 import cn.ahut.entity.PersonInfo;
+import cn.ahut.entity.PsychosispersoninfoTable;
 import cn.ahut.entity.code_id.*;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,7 +15,11 @@ public interface personMapper {
 
      @Select("select * from psychosispersoninfo")
      List<PersonInfo> selectAll();
+
      void  addPerson(PersonInfo person);
+
+     void addOriginData(PsychosispersoninfoTable psychosispersoninfoTable);
+
      List<PersonInfo> selectihz(int m);
 
      List<FirstAge> selectfa();

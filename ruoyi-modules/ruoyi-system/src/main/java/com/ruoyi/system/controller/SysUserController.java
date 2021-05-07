@@ -242,4 +242,19 @@ public class SysUserController extends BaseController
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUserStatus(user));
     }
+
+    /**
+     * 权限修改
+     */
+    @PreAuthorize(hasPermi = "system:user:edit")
+    @Log(title = "用户权限管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeSwitchs")
+    public AjaxResult changeSwitchs(@RequestBody SysUser user)
+    {
+        userService.checkUserAllowed(user);
+        user.setUpdateBy(SecurityUtils.getUsername());
+        int i = userService.updateUserSwitch(user);
+        System.out.println(i);
+        return toAjax(userService.updateUserSwitch(user));
+    }
 }

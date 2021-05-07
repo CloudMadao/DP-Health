@@ -9,6 +9,14 @@ export function listJsb(query) {
   })
 }
 
+// 查询单个精神病患者信息
+export function listOne(sno) {
+  return request({
+    url: '/ttjm/jsb/'+sno,
+    method: 'get',
+  })
+}
+
 // 删除精神病患者信息
 export function delJsb(sno) {
   return request({
@@ -27,7 +35,17 @@ export function addSufferer(data) {
   })
 }
 
-//导入原始数据
+//更新患者信息
+export function updateSufferer(data) {
+  return request({
+    url: '/ttjm/jsb/updateSufferer',
+    method: 'post',
+    data: data
+  })
+}
+
+
+//将原始数据加密后导入数据库
 export function importData(data) {
   return request({
     url: '/ttjm/jsb/dataimport',
@@ -61,6 +79,9 @@ export function dataGet(json) {
     data: json
   })
 }
+
+
+
 
 
 

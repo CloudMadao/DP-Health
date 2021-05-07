@@ -2,9 +2,21 @@
   <div class="app-container">
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-dropdown trigger="click" :hide-on-click="false">
-          <el-button type="warning" size="mini" >
-            信息统计<i class="el-icon-arrow-down el-icon--right"></i>
+        <el-select v-model="DataBase" placeholder="请选择" @change="changeSelect">
+          <el-option
+            v-for="(item,index) in DataBaseOptions"
+            :key="index1"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="cyan" icon="el-icon-s-data"  @click="countryCount">数据统计</el-button>
+<!--        <el-dropdown trigger="click" :hide-on-click="false">
+
+          <el-button type="warning" >
+            信息统计<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
           </el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
@@ -26,13 +38,10 @@
                 </el-form-item>
               </el-form>
             </el-dropdown-item>
-            <!--            <el-dropdown-item>黄金糕</el-dropdown-item>
-                        <el-dropdown-item>狮子头</el-dropdown-item>-->
           </el-dropdown-menu>
-        </el-dropdown>
+        </el-dropdown>-->
       </el-col>
-      <div id="main" class="pie-class" :style="{width: '1600px', height: '800px' }"/>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <div id="main" class="pie-class" :style="{width: '1000px', height: '700px' }"/>
     </el-row>
 
     <pagination
@@ -57,7 +66,7 @@ export default {
   name: "Jsb",
   data() {
     return {
-
+      DataBaseOptions: ['精神病患者地区分布', '精神病患者肇事次数', '精神病患者轻度症状','精神病患者重度症状'],
       testimage: require('@/assets/image/image.jpg'),
       // 遮罩层
       loading: true,
@@ -140,6 +149,11 @@ export default {
       menuOptions: [],
       // 部门列表
       deptOptions: [],
+
+      DataBase:"精神病数据统计",
+      DataBaseBrandSecond:"肇事次数",
+      DropDownTitle: ['肇事次数', '自伤次数', '自杀次数','住院次数'],
+
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -179,7 +193,7 @@ export default {
     };
   },
   created() {
-    this.getList();
+    /*this.getList();*/
   },
   methods: {
     /** 查询菜单树结构 */
@@ -277,44 +291,75 @@ export default {
 
     /** 按照地区统计患病信息*/
     countryCount() {
-      return groupCountryPost(this.queryParams).then(response=>{
-        this.echartparam=response.data;
-        for(let key in this.echartparam){
-          this.echartparamx.push(this.echartparam[key].property);
-          this.echartparamy.push(this.echartparam[key].count);
-        }
-        let chartDom = document.getElementById('main');
-        let myChart = echarts.init(chartDom);
-        let option = {
-          xAxis: {
-            type: 'category',
-            data: this.echartparamx,
-          },
-          yAxis: {
-            type: 'value'
-          },
-          series: [{
-            data: this.echartparamy,
-            type: 'bar',
-            itemStyle: {
-              normal: {
-                label: {
-                  show: true, //开启显示
-                  position: 'top', //在上方显示
-                  textStyle: { //数值样式
-                    color: 'black',
-                    fontSize: 16
-                  }
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else {
+        return groupCountryPost(this.queryParams).then(response=>{
+          this.echartparam=response.data;
+          for(let key in this.echartparam){
+            this.echartparamx.push(this.echartparam[key].property);
+            this.echartparamy.push(this.echartparam[key].count);
+          }
+          let chartDom = document.getElementById('main');
+          let myChart = echarts.init(chartDom);
+          let option = {
+            title: {
+              text: '精神病患者地区分布统计图',
+              left: 'center',
+              top: 50,
+
+            },
+            grid: [
+              {
+                y:100,
+                containLabel: true
+              },
+              ],
+
+            xAxis: {
+              type: 'category',
+              data: this.echartparamx,
+            },
+            yAxis: {
+              type: 'value'
+            },
+            toolbox:{
+              feature:{
+                saveAsImage:{},
+                dataView:{},
+                restore:{},
+                dataZoom:{},
+                magicType:{
+                  type:['bar','line'],
                 },
-                color: '#2f4554',
               }
             },
-          }]
-        }
-        this.$nextTick(() => {
-          myChart.setOption(option);
-        });
-      })
+
+            series: [{
+              data: this.echartparamy,
+              type: 'bar',
+              itemStyle: {
+                normal: {
+                  label: {
+                    show: true, //开启显示
+                    position: 'top', //在上方显示
+                    textStyle: { //数值样式
+                      color: 'black',
+                      fontSize: 16
+                    }
+                  },
+                  color: '#2f4554',
+                }
+              },
+            }]
+          }
+          this.$nextTick(() => {
+            myChart.setOption(option);
+          });
+        })
+      }
     },
 
     /** 搜索按钮操作 */

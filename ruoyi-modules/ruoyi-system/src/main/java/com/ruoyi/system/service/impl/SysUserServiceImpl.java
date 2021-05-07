@@ -257,6 +257,17 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
+     * 修改用户权限状态
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public int updateUserSwitch(SysUser user) {
+        return userMapper.updateUser(user);
+    }
+
+    /**
      * 修改用户基本信息
      * 
      * @param user 用户信息

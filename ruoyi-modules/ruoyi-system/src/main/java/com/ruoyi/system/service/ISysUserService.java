@@ -106,6 +106,15 @@ public interface ISysUserService
      */
     public int updateUserStatus(SysUser user);
 
+
+    /**
+     * 修改用户权限状态
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    public int updateUserSwitch(SysUser user);
+
     /**
      * 修改用户基本信息
      * 

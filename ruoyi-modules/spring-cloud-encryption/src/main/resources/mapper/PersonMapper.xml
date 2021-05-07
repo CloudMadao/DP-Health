@@ -5,23 +5,36 @@
 
 
   <insert id="addPerson" parameterType="PersonInfo">
-     insert into PSYCHOSISPERSONINFO ( SNO, SGUARDIANNAME,
-      SGUARDIANPROVINCE, SGUARDIANCITY, SGUARDIANCOUNTRY,
-      SGUARDIANVILLAGE, SGUARDIANHOUSENO, SGUARDIANTELEPHONE,
-      SPATIENTTELEPHONE, SCHARGEPHYSICIAN, SFIRSTDISEASETIME,
-       IFIRSTDISEASEAGE,
-      SSYMPTOMSCODE, IHOSPITALIZATIONS, SPSYCHOSISCODE,
-      TREATMENTEFFECTCODE, IHIT,SDOCTORADVICE, DFILLTIME,ISUICIDE,IATTEMPTEDSUICIDE
-      )
+     insert into PSYCHOSISPERSONINFO ( SNO, SGUARDIANNAME,SGUARDIANPROVINCE, SGUARDIANCITY, SGUARDIANCOUNTRY,SGUARDIANVILLAGE, SGUARDIANHOUSENO, SGUARDIANTELEPHONE,SPATIENTTELEPHONE, SCHARGEPHYSICIAN, SFIRSTDISEASETIME,IFIRSTDISEASEAGE,
+      SSYMPTOMSCODE, IHOSPITALIZATIONS, SPSYCHOSISCODE,TREATMENTEFFECTCODE, IHIT,SDOCTORADVICE, DFILLTIME,DOCTORID)
     values (#{sno,jdbcType=VARCHAR}, #{sguardianname,jdbcType=VARCHAR},
       #{sguardianprovince,jdbcType=VARCHAR}, #{sguardiancity,jdbcType=VARCHAR}, #{sguardiancountry,jdbcType=VARCHAR},
       #{sguardianvillage,jdbcType=VARCHAR}, #{sguardianhouseno,jdbcType=VARCHAR}, #{sguardiantelephone,jdbcType=VARCHAR},
       #{spatienttelephone,jdbcType=VARCHAR}, #{schargephysician,jdbcType=VARCHAR}, #{sfirstdiseasetime,jdbcType=VARCHAR},
-       #{ifirstdiseaseage,jdbcType=BLOB},
+      #{ifirstdiseaseage,jdbcType=BLOB},
       #{ssymptomscode,jdbcType=BLOB}, #{ihospitalizations,jdbcType=BLOB}, #{spsychosiscode,jdbcType=BLOB},
-      #{treatmenteffectcode,jdbcType=BLOB}, #{ihit,jdbcType=BLOB},#{sdoctoradvice,jdbcType=VARCHAR}, #{dfilltime,jdbcType=TIMESTAMP}, #{isuicide,jdbcType=BLOB}, #{iattemptedsuicide,jdbcType=BLOB})
-
+      #{treatmenteffectcode,jdbcType=BLOB}, #{ihit,jdbcType=BLOB},#{sdoctoradvice,jdbcType=VARCHAR}, #{dfilltime,jdbcType=TIMESTAMP},#{doctorid,jdbcType=VARCHAR})
      </insert>
+
+
+    <insert id="addOriginData" parameterType="PsychosispersoninfoTable">
+        insert into PSYCHOSISPERSONINFOTABLE (sKEY, SNO, SGUARDIANNAME,
+                                          SGUARDIANPROVINCE, SGUARDIANCITY, SGUARDIANCOUNTRY,
+                                          SGUARDIANVILLAGE, SGUARDIANHOUSENO, SGUARDIANTELEPHONE,
+                                          SPATIENTTELEPHONE, SCHARGEPHYSICIAN, SFIRSTDISEASETIME,
+                                          IFIRSTDISEASEAGE,
+                                          SSYMPTOMSCODE, IHOSPITALIZATIONS, SPSYCHOSISCODE,
+                                          TREATMENTEFFECTCODE, IHIT,SDOCTORADVICE, DFILLTIME,ISUICIDE,IATTEMPTEDSUICIDE,DOCTORID
+        )
+        values (#{skey,jdbcType=VARCHAR},#{sno,jdbcType=VARCHAR}, #{sguardianname,jdbcType=VARCHAR},
+                #{sguardianprovince,jdbcType=VARCHAR}, #{sguardiancity,jdbcType=VARCHAR}, #{sguardiancountry,jdbcType=VARCHAR},
+                #{sguardianvillage,jdbcType=VARCHAR}, #{sguardianhouseno,jdbcType=VARCHAR}, #{sguardiantelephone,jdbcType=VARCHAR},
+                #{spatienttelephone,jdbcType=VARCHAR}, #{schargephysician,jdbcType=VARCHAR}, #{sfirstdiseasetime,jdbcType=VARCHAR},
+                #{ifirstdiseaseage,jdbcType=VARCHAR},
+                #{ssymptomscode,jdbcType=VARCHAR}, #{ihospitalizations,jdbcType=VARCHAR}, #{spsychosiscode,jdbcType=VARCHAR},
+                #{treatmenteffectcode,jdbcType=VARCHAR}, #{ihit,jdbcType=VARCHAR},#{sdoctoradvice,jdbcType=VARCHAR}, #{dfilltime,jdbcType=TIMESTAMP}, #{isuicide,jdbcType=VARCHAR}, #{iattemptedsuicide,jdbcType=VARCHAR},#{doctorid,jdbcType=VARCHAR})
+    </insert>
+
 
     <select id="selectfa" resultType="FirstAge" >
         select * from FIRSTDISEASEAGE order by "id" asc
