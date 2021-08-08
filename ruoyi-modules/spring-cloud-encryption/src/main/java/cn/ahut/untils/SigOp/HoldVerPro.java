@@ -92,7 +92,7 @@ public class HoldVerPro {
         int i=0;
         for (byte bt: allbyte){
             Element encrypt = DoEncrypt.encrypt(bt, pk);
-            encrypt = encrypt.pow(sigKey.get_Prk());
+            encrypt = encrypt.pow(prk);
             byte[] bytes = encrypt.toBytes();
             int length=ecodebyte.length;
             ecodebyte=addLen.addBtLength(ecodebyte,258);

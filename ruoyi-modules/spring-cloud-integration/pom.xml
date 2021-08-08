@@ -38,6 +38,12 @@
             <version>0.9.0.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>homomorphic-encryption</groupId>
+            <artifactId>spring-cloud-encryption</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- 通用工具-->
         <dependency>
             <groupId>com.ruoyi</groupId>

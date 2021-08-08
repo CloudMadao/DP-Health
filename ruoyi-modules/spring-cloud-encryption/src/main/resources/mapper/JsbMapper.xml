@@ -125,4 +125,20 @@
     <select id="getAllOriginInfo" resultMap="OriginJsbData" parameterType="DataImport" statementType="STATEMENT">
         SELECT * FROM ${originTableName}
     </select>
+
+    <insert id="insertTargetTable" parameterType="java.util.List">
+        insert into PSYCHOSISPERSONINFO ( SNO, SGUARDIANNAME,SGUARDIANPROVINCE, SGUARDIANCITY, SGUARDIANCOUNTRY,SGUARDIANTELEPHONE,
+                                          SPATIENTTELEPHONE, SCHARGEPHYSICIAN,SSYMPTOMSCODE,  SPSYCHOSISCODE,TREATMENTEFFECTCODE, IHIT,SDOCTORADVICE,DOCTORID
+        )
+        <foreach collection="list" item="item" index="index" separator="union all">
+            SELECT #{item.sno,jdbcType=VARCHAR}, #{item.sguardianname,jdbcType=VARCHAR},
+            #{item.sguardianprovince,jdbcType=VARCHAR}, #{item.sguardiancity,jdbcType=VARCHAR}, #{item.sguardiancountry,jdbcType=VARCHAR},
+            #{item.sguardiantelephone,jdbcType=VARCHAR},
+            #{item.spatienttelephone,jdbcType=VARCHAR}, #{item.schargephysician,jdbcType=VARCHAR},
+            #{item.ssymptomscode,jdbcType=BLOB}, #{item.spsychosiscode,jdbcType=BLOB},
+            #{item.treatmenteffectcode,jdbcType=BLOB}, #{item.ihit,jdbcType=BLOB},#{item.sdoctoradvice,jdbcType=VARCHAR},
+            #{item.doctorid} From dual
+        </foreach>
+    </insert>
+
 </mapper>

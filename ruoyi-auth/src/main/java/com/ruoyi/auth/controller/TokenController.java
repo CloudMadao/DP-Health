@@ -13,6 +13,8 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.security.service.TokenService;
 import com.ruoyi.system.api.model.LoginUser;
 
+import java.util.Map;
+
 /**
  * token 控制
  * 
@@ -32,6 +34,8 @@ public class TokenController
     {
         // 用户登录
         LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
+
+        Map<String, Object> token = tokenService.createToken(userInfo);
         // 获取登录token
         return R.ok(tokenService.createToken(userInfo));
     }

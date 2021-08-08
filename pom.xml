@@ -206,11 +206,12 @@
 		<module>ruoyi-modules</module>
 		<module>ruoyi-api</module>
 		<module>ruoyi-common</module>
-        <module>datashow</module>
-        <module>datashow</module>
-        <module>ruoyi-datashow</module>
-        <module>have-fun</module>
-        <module>spring-cloud-Integration</module>
+        <module>spring-cloud-encyrption2</module>
+        <!--        <module>datashow</module>
+                <module>datashow</module>
+                <module>ruoyi-datashow</module>
+                <module>have-fun</module>
+                <module>spring-cloud-Integration</module>-->
     </modules>
     <packaging>pom</packaging>
 

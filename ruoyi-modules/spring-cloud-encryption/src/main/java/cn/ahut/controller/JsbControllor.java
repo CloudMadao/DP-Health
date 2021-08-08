@@ -2,6 +2,7 @@ package cn.ahut.controller;
 
 
 import cn.ahut.Mapper.JsbDataShow;
+import cn.ahut.Mapper.personMapper;
 import cn.ahut.entity.*;
 import cn.ahut.entity.key.PrivateKey;
 import cn.ahut.entity.key.PublicKey;
@@ -9,8 +10,11 @@ import cn.ahut.untils.BGNKey.get_PrivateKey;
 import cn.ahut.untils.BGNKey.get_PubilcKey;
 import cn.ahut.untils.BGNOp.DoDecrypt;
 import cn.ahut.untils.Get_Param;
+import cn.ahut.untils.SigOp.HoldVerPro;
 import cn.ahut.utils.Decrypt;
 import cn.ahut.utils.Encryption;
+import cn.ahut.utils.FileUrlEntity;
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
@@ -49,6 +53,12 @@ public class JsbControllor extends BaseController {
     @Autowired
     private Encryption encryption;
 
+    @Autowired
+    private HoldVerPro hvp;
+
+    @Autowired
+    private personMapper personmapper;
+
     private PairingParameters param ;
 
 
@@ -57,6 +67,10 @@ public class JsbControllor extends BaseController {
         startPage();
         LoginUser loginUser = tokenService.getLoginUser();
         SysUser sysUser = loginUser.getSysUser(); //获取登录用户
+      /*  SysUser sysUser = new SysUser();
+        sysUser.setSwitchs(1);
+        sysUser.setUserId((long)123);
+        sysUser.setAuthorityId(1);*/
 
         if(sysUser.getSwitchs()==1) {
             if (sysUser.getAuthorityId() == 1) { //有部分明文权限
@@ -158,13 +172,20 @@ public class JsbControllor extends BaseController {
      * @param
      */
     @PostMapping("/sufferer")
-    public void add(@Validated @RequestBody PsychosispersoninfoTable psychosispersoninfoTable) throws Exception {
+    public AjaxResult add(@Validated @RequestBody PsychosispersoninfoTable psychosispersoninfoTable) throws Exception {
+
         //获取录入医生信息
         LoginUser loginUser = tokenService.getLoginUser();
         SysUser sysUser = loginUser.getSysUser();
 
+        //用于插入测试
+      /*  SysUser sysUser = new SysUser();
+        sysUser.setUserId((long)123);*/
+
         Psychosispersoninfop psy = new Psychosispersoninfop();
         psy.setSno(psychosispersoninfoTable.getSno());
+
+
         psy.setSguardianname(psychosispersoninfoTable.getSguardianname());
         psy.setSguardianprovince(psychosispersoninfoTable.getSguardianprovince());
         psy.setSguardiancity(psychosispersoninfoTable.getSguardiancity());
@@ -189,6 +210,8 @@ public class JsbControllor extends BaseController {
         psy.setTreatmenteffectcode(encryption.doEncryption(treatmenteffectcode));
 
         jsbDataShow.insertJsb(psy);
+
+        return AjaxResult.success("患者信息添加成功");
     }
 
 
@@ -196,14 +219,68 @@ public class JsbControllor extends BaseController {
      *明文数据加密后导入数据库
      */
     @PostMapping("/dataimport")
-    public void importData(@Validated @RequestBody DataImport dataImport) throws Exception {
-        System.out.println(dataImport.getOriginTableName());
-        System.out.println(dataImport.getStartTime());
-        System.out.println(dataImport.getEndTime());
+    public AjaxResult importData(@Validated @RequestBody DataImport dataImport) throws Exception {
 
+
+        List<Psychosispersoninfop> infos = new ArrayList<>();
         List<PsychosispersoninfoTable> allOriginInfo = jsbDataShow.getAllOriginInfo(dataImport);
-        PsychosispersoninfoTable psychosispersoninfoTable = allOriginInfo.get(0);
-        System.out.println(psychosispersoninfoTable.getIhit());
+
+        for(PsychosispersoninfoTable psychosispersoninfoTable:allOriginInfo){
+            Psychosispersoninfop psychosispersoninfop = new Psychosispersoninfop();
+
+            psychosispersoninfop.setSkey(psychosispersoninfoTable.getSkey());
+            psychosispersoninfop.setSno(psychosispersoninfoTable.getSno());
+            psychosispersoninfop.setSguardianname(psychosispersoninfoTable.getSguardianname());
+            psychosispersoninfop.setSguardianprovince(psychosispersoninfoTable.getSguardianprovince());
+            psychosispersoninfop.setSguardiancity(psychosispersoninfoTable.getSguardiancity());
+            psychosispersoninfop.setSguardiancountry(psychosispersoninfoTable.getSguardiancountry());
+            psychosispersoninfop.setSchargephysician(psychosispersoninfoTable.getSchargephysician());
+            psychosispersoninfop.setSpatienttelephone(psychosispersoninfoTable.getSpatienttelephone());
+            psychosispersoninfop.setSguardiantelephone(psychosispersoninfoTable.getSguardiantelephone());
+
+            Integer doctorid = Integer.valueOf(psychosispersoninfoTable.getDoctorid());
+            psychosispersoninfop.setDoctorid(doctorid);
+
+
+            Integer ssymptomscode = Integer.valueOf(psychosispersoninfoTable.getSsymptomscode());
+            psychosispersoninfop.setSsymptomscode(encryption.doEncryption(ssymptomscode));
+
+            Integer zzcode = Integer.valueOf(psychosispersoninfoTable.getSpsychosiscode());
+            psychosispersoninfop.setSpsychosiscode(encryption.doEncryption(zzcode));
+
+            Integer ihit = Integer.valueOf(psychosispersoninfoTable.getIhit()); //肇事次数
+            psychosispersoninfop.setIhit(encryption.doEncryption(ihit));
+
+            Integer treatmenteffectcode = Integer.valueOf(psychosispersoninfoTable.getTreatmenteffectcode());
+            psychosispersoninfop.setTreatmenteffectcode(encryption.doEncryption(treatmenteffectcode));
+
+
+
+            infos.add(psychosispersoninfop);
+        }
+        int i = jsbDataShow.insertTargetTable(infos);
+        return AjaxResult.success("数据库加密导入成功");
+    }
+
+
+    @PostMapping("/filecheck")
+    public AjaxResult fileChecks(@RequestBody FileUrlEntity fileUrlEntity) throws Exception {
+        JSONObject cjson = new JSONObject();
+        JSONObject sjson = new JSONObject();
+
+        cjson.put("dir",fileUrlEntity.getMiwenPath());
+        cjson.put("filename",fileUrlEntity.getMiwenName());
+        sjson.put("dir",fileUrlEntity.getSgnPath());
+        sjson.put("filename",fileUrlEntity.getSgnName());
+
+
+        boolean b = hvp.chanLlAge(cjson, sjson);
+
+        if(b){
+            return AjaxResult.success("文件完整性校验通过",b);
+        }
+
+        return AjaxResult.success("文件完整性校验未通过",b);
     }
 
 
@@ -220,4 +297,5 @@ public class JsbControllor extends BaseController {
     public void update(@Validated @RequestBody Psychosispersoninfop psychosispersoninfop) throws Exception {
 
     }
+
 }

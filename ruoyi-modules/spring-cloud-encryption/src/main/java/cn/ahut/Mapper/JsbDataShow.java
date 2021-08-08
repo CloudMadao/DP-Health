@@ -66,4 +66,6 @@ public interface JsbDataShow {
      */
     List<PsychosispersoninfoTable> getAllOriginInfo(DataImport dataImport);
 
+    int insertTargetTable(List<Psychosispersoninfop> list);
+
 }

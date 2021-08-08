@@ -65,6 +65,16 @@
           @click="handleImport"
         >导入</el-button>
       </el-col>
+
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          icon="el-icon-folder"
+          size="mini"
+          @click="filemOperate"
+        >文件操作</el-button>
+      </el-col>
+
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -200,6 +210,29 @@
       </div>
     </el-dialog>
 
+    <!-- 文件完整性验证 -->
+    <el-dialog :title="titles" :visible.sync="openfile" width="500px" append-to-body>
+      <el-form ref="form" :model="fileurl"  label-width="150px">
+        <el-form-item label="密文文件路径" prop="miwenPath">
+          <el-input v-model="fileurl.miwenPath"></el-input>
+        </el-form-item>
+        <el-form-item label="密文文件名称" prop="miwenName">
+          <el-input v-model="fileurl.miwenName"></el-input>
+        </el-form-item>
+        <el-form-item label="签名文件路径" prop="sgnPath">
+          <el-input v-model="fileurl.sgnPath"></el-input>
+        </el-form-item>
+        <el-form-item label="签名文件名称" prop="sgnName">
+          <el-input v-model="fileurl.sgnName"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button type="warning" @click="checkFileInfo">文件完整性验证</el-button>
+        <el-button @click="cancel2">取 消</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 修改患者信息 -->
     <el-dialog :title="title" :visible.sync="openhz" width="500px" append-to-body>
       <el-form ref="form" :model="modifyform" :rules="rules" label-width="150px">
@@ -280,8 +313,7 @@
 import {changeRoleStatus, getRole} from "@/api/system/role";
 import {roleMenuTreeselect, treeselect as menuTreeselect} from "@/api/system/menu";
 import {roleDeptTreeselect, treeselect as deptTreeselect} from "@/api/system/dept";
-import {addSufferer, delJsb, importData, jmJsb, listJsb, listOne} from "@/api/ttjm/ttjm";
-import {getUser} from "@/api/system/user";
+import {addSufferer, checkFile, delJsb, importData, jmJsb, listJsb, listOne} from "@/api/ttjm/ttjm";
 
 
 export default {
@@ -294,6 +326,9 @@ export default {
       loading: true,
       // 选中数组
       ids: [],
+
+      fileList: [],
+
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -313,6 +348,7 @@ export default {
       open: false,
       opens: false,
       openhz: false,
+      openfile: false,
       ihitimage: false,
       // 是否显示弹出层（数据权限）
       openDataScope: false,
@@ -389,6 +425,13 @@ export default {
         targetTableName:'',
         startTime:'',
         endTime:'',
+      },
+
+      fileurl: {
+        sgnPath:'',
+        sgnName:'',
+        miwenPath:'',
+        miwenName:'',
       },
 
       modifyform:{
@@ -507,6 +550,12 @@ export default {
     // 取消按钮(数据导入)
     cancel1() {
       this.opens = false;
+      this.ihitimage=false;
+      this.reset();
+    },
+
+    cancel2() {
+      this.openfile = false;
       this.ihitimage=false;
       this.reset();
     },
@@ -649,6 +698,40 @@ export default {
     },
 
 
+
+    beforeUpload(file) {
+      const fileType = file.name.substring(file.name.lastIndexOf('.'))
+      if (fileType.toLowerCase() != '.txt') {
+        this.$message.error('文件必须为.txt类型')
+        this.fileList = []
+        return false
+      }
+    },
+    // 覆盖element的默认上传文件
+    uploadHttpRequest(data) {
+      let reader = new FileReader()
+      let that = this
+      reader.readAsText(data.file)
+      reader.onload = function() {
+        that.formData.mmiapXml = this.result
+      }
+    },
+
+
+
+    filemOperate(){
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else {
+        this.reset();
+
+        this.openfile = true;
+        this.titles = "文件完整性验证";
+      }
+    },
+
     /** 修改按钮*/
     handleModify(data) {
       this.reset();
@@ -731,9 +814,31 @@ export default {
     submitDataForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          debugger;
           importData(this.dataform).then(response => {
             this.msgSuccess("数据导入成功");
             this.opens = false;
+            this.getList();
+          });
+        }
+      });
+    },
+
+    /** 文件完整性验证*/
+    checkFileInfo(){
+      this.$refs["form"].validate(valid => {
+        if (valid) {
+          debugger;
+          let fileurls = this.fileurl;
+          checkFile(fileurls).then(response => {
+            debugger;
+
+            if(response.data){
+              this.msgSuccess("文件完整性校验通过");
+            }else{
+              this.msgError("文件完整性校验未通过")
+            }
+            this.openfile = false;
             this.getList();
           });
         }

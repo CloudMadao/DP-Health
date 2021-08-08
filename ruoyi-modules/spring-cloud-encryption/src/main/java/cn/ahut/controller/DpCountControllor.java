@@ -1,50 +1,57 @@
-package min.ahut.controllor;
+package cn.ahut.controller;
 
-import cn.ahut.utils.DpMiwen;
+import cn.ahut.Mapper.JsbDataShow;
+import cn.ahut.untils.SigOp.HoldVerPro;
+import cn.ahut.utils.*;
 import com.ruoyi.common.core.web.domain.AjaxResult;
-import min.ahut.domain.GroupEntity;
-import min.ahut.mapper.DpMapper;
-import min.ahut.utils.HistogramSort;
-import min.ahut.utils.NoiseMaker;
-import min.ahut.utils.NoiseModify;
+import it.unisa.dia.gas.jpbc.PairingParameters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
- * Created by wzw on 2021/3/23.
+ * Created by wzw on 2021/7/17.
  */
+
 @RestController
-@RequestMapping("/dp")
-public class DpControllor {
+@RequestMapping("/dpcount")
+public class DpCountControllor {
     @Autowired
-    DpMapper dpMapper;
+    JsbDataShow jsbDataShow;
     @Autowired
-    NoiseMaker noiseMaker;
+    private DpMiwen dpMiwen;
     @Autowired
     HistogramSort histogramSort;
     @Autowired
+    NoiseMaker noiseMaker;
+    @Autowired
     NoiseModify noiseModify;
 
+    @Autowired
+    HoldVerPro hpv;
+
+    private PairingParameters param ;
 
     /**
-     *按县区对病人进行分组处理-原始数据
+     *按肇事次数对病人进行分组处理-原始数据
      */
-    @GetMapping("/countrycount")
-    public AjaxResult getCountFromCountry(@RequestParam(value ="sguardiancountry",required = false) String...countryName){
-        List<GroupEntity> countFromCountryByName = dpMapper.getCountFromCountryByName(countryName);
-        return AjaxResult.success(countFromCountryByName);
+    @GetMapping("/ihitcount")
+    public AjaxResult getCountFromCountry() throws Exception {
+        List<GroupEntity> ihitCount = dpMiwen.getIhitCount();
+        return AjaxResult.success(dpMiwen.getIhitCount());
     }
 
     /**
      *按县区对病人进行分组处理且加噪
      */
-    @PostMapping("/countrycount")
-    public AjaxResult getCountFromCountryAddNoise(@RequestParam(value ="sguardiancountry",required = false) String...countryName){
-
-        List<GroupEntity> countFromCountryByName = dpMapper.getCountFromCountryByName(countryName);
-        List<GroupEntity> sort = histogramSort.sort(countFromCountryByName);
+    @PostMapping("/ihitcount")
+    public AjaxResult getCountFromCountryAddNoise() throws Exception {
+        List<GroupEntity> ihitCount = dpMiwen.getIhitCount();
+        List<GroupEntity> sort = histogramSort.sort(ihitCount);
 
         for (GroupEntity gp:sort){
             System.out.println(gp.getProperty()+"----"+gp.getCount());
@@ -75,7 +82,7 @@ public class DpControllor {
             System.out.println(gp.getProperty()+"----"+gp.getCount());
         }
 
-        return AjaxResult.success(countFromCountryByName);
+        return AjaxResult.success(sort);
     }
 
 }

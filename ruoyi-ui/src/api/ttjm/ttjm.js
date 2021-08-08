@@ -1,4 +1,6 @@
 import request from '@/utils/request'
+import qs from  'qs'
+import da from "element-ui/src/locale/lang/da";
 
 // 查询精神病患者列表
 export function listJsb(query) {
@@ -80,6 +82,15 @@ export function dataGet(json) {
   })
 }
 
+
+//对文件按照路径进行完整性验证
+export function checkFile(data) {
+  return request({
+    url: '/ttjm/jsb/filecheck',
+    method: 'post',
+    data: data
+  })
+}
 
 
 

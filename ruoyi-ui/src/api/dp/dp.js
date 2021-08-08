@@ -17,3 +17,12 @@ export function groupCountryPost(query) {
   })
 }
 
+
+export function groupihitPost(query) {
+  return request({
+    url: '/ttjm/dpcount/ihitcount',
+    method: 'post',
+    params: query
+  })
+}
+

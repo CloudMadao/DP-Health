@@ -38,6 +38,7 @@ public class testController {
     @Autowired
     private HoldVerPro hvp;
 
+
     @RequestMapping("/quick2")
     @ResponseBody
 

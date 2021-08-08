@@ -12,7 +12,11 @@
         </el-select>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="cyan" icon="el-icon-s-data"  @click="countryCount">数据统计</el-button>
+<!--        <el-button type="cyan" icon="el-icon-s-data"  @click="countryCount">数据统计</el-button>-->
+
+<!--        <el-button type="cyan" icon="el-icon-s-data"  @click="ihitCount">数据统计</el-button>-->
+
+        <el-button type="cyan" icon="el-icon-s-data"  @click="commit">数据统计</el-button>
 <!--        <el-dropdown trigger="click" :hide-on-click="false">
 
           <el-button type="warning" >
@@ -40,8 +44,9 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>-->
+        <div id="main" class="pie-class" :style="{width: '1000px', height: '700px'} "  />
       </el-col>
-      <div id="main" class="pie-class" :style="{width: '1000px', height: '700px' }"/>
+<!--      <div id="main" class="pie-class" :style="{width: '1000px', height: '700px'} "  />-->
     </el-row>
 
     <pagination
@@ -59,7 +64,7 @@ import {changeRoleStatus, dataScope, getRole} from "@/api/system/role";
 import {roleMenuTreeselect, treeselect as menuTreeselect} from "@/api/system/menu";
 import {roleDeptTreeselect, treeselect as deptTreeselect} from "@/api/system/dept";
 import {delJsb, jmJsb, listJsb} from "@/api/ttjm/ttjm";
-import {groupCountry, groupCountryPost} from "@/api/dp/dp";
+import { groupCountryPost, groupihitPost} from "@/api/dp/dp";
 import * as echarts from 'echarts';
 
 export default {
@@ -289,7 +294,160 @@ export default {
       this.resetForm("form");
     },
 
-    /** 按照地区统计患病信息*/
+    commit(){
+      let database=this.DataBase;
+      this.echartparamx=[];
+      this.echartparamy=[];
+      /** 按照肇事次数统计患病信息*/
+      if(database=="精神病患者肇事次数"){
+          let userName = this.$store.state.user.name;
+          if(userName=="admin"){
+            this.msgError("权限不足");
+            this.open = false;
+          }else {
+            return groupihitPost(this.queryParams).then(response=>{
+              this.echartparam=response.data;
+              for(let key in this.echartparam){
+                this.echartparamx.push(this.echartparam[key].property);
+                this.echartparamy.push(this.echartparam[key].count);
+              }
+              let chartDom = document.getElementById('main');
+              let myChart = echarts.init(chartDom);
+
+              let option = {
+                title: {
+                  text: '精神病患者肇事次数统计图',
+                  left: 'center',
+                  top: 50,
+
+                },
+
+                grid: [
+                  {
+                    y:100,
+                    containLabel: true
+                  },
+                ],
+
+                xAxis: {
+                  type: 'category',
+                  data: this.echartparamx,
+                },
+                yAxis: {
+                  type: 'value'
+                },
+                toolbox:{
+                  feature:{
+                    saveAsImage:{},
+                    dataView:{},
+                    restore:{},
+                    dataZoom:{},
+                    magicType:{
+                      type:['bar','line'],
+                    },
+                  }
+                },
+
+                series: [{
+                  data: this.echartparamy,
+                  type: 'bar',
+                  itemStyle: {
+                    normal: {
+                      label: {
+                        show: true, //开启显示
+                        position: 'top', //在上方显示
+                        textStyle: { //数值样式
+                          color: 'black',
+                          fontSize: 16
+                        }
+                      },
+                      color: '#2f4554',
+                    }
+                  },
+                }]
+              }
+              this.$nextTick(() => {
+                myChart.setOption(option);
+              });
+            })
+          }
+      }
+      /** 按照地区统计患病信息*/
+      if(database=="精神病患者地区分布"){
+          let userName = this.$store.state.user.name;
+          if(userName=="admin"){
+            this.msgError("权限不足");
+            this.open = false;
+          }else {
+            return groupCountryPost(this.queryParams).then(response=>{
+              this.echartparam=response.data;
+              for(let key in this.echartparam){
+                this.echartparamx.push(this.echartparam[key].property);
+                this.echartparamy.push(this.echartparam[key].count);
+              }
+              let chartDom = document.getElementById('main');
+              let myChart = echarts.init(chartDom);
+              myChart.clear();
+              let option = {
+                title: {
+                  text: '精神病患者地区分布统计图',
+                  left: 'center',
+                  top: 50,
+
+                },
+                grid: [
+                  {
+                    y:100,
+                    containLabel: true
+                  },
+                ],
+
+                xAxis: {
+                  type: 'category',
+                  data: this.echartparamx,
+                },
+                yAxis: {
+                  type: 'value'
+                },
+                toolbox:{
+                  feature:{
+                    saveAsImage:{},
+                    dataView:{},
+                    restore:{},
+                    dataZoom:{},
+                    magicType:{
+                      type:['bar','line'],
+                    },
+                  }
+                },
+
+                series: [{
+                  data: this.echartparamy,
+                  type: 'bar',
+                  itemStyle: {
+                    normal: {
+                      label: {
+                        show: true, //开启显示
+                        position: 'top', //在上方显示
+                        textStyle: { //数值样式
+                          color: 'black',
+                          fontSize: 16
+                        }
+                      },
+                      color: '#2f4554',
+                    }
+                  },
+                }]
+              }
+              this.$nextTick(() => {
+                myChart.setOption(option);
+              });
+            })
+          }
+      }
+    },
+
+/*    /!** 按照地区统计患病信息*!/
     countryCount() {
       let userName = this.$store.state.user.name;
       if(userName=="admin"){
@@ -360,8 +518,82 @@ export default {
           });
         })
       }
-    },
+    },*/
 
+
+ /*   /!** 按照肇事次数统计患病信息*!/
+    ihitCount() {
+      let userName = this.$store.state.user.name;
+      if(userName=="admin"){
+        this.msgError("权限不足");
+        this.open = false;
+      }else {
+        return groupihitPost(this.queryParams).then(response=>{
+          this.echartparam=response.data;
+          for(let key in this.echartparam){
+            this.echartparamx.push(this.echartparam[key].property);
+            this.echartparamy.push(this.echartparam[key].count);
+          }
+          let chartDom = document.getElementById('main');
+          let myChart = echarts.init(chartDom);
+          let option = {
+            title: {
+              text: '精神病患者肇事次数统计图',
+              left: 'center',
+              top: 50,
+
+            },
+            grid: [
+              {
+                y:100,
+                containLabel: true
+              },
+            ],
+
+            xAxis: {
+              type: 'category',
+              data: this.echartparamx,
+            },
+            yAxis: {
+              type: 'value'
+            },
+            toolbox:{
+              feature:{
+                saveAsImage:{},
+                dataView:{},
+                restore:{},
+                dataZoom:{},
+                magicType:{
+                  type:['bar','line'],
+                },
+              }
+            },
+
+            series: [{
+              data: this.echartparamy,
+              type: 'bar',
+              itemStyle: {
+                normal: {
+                  label: {
+                    show: true, //开启显示
+                    position: 'top', //在上方显示
+                    textStyle: { //数值样式
+                      color: 'black',
+                      fontSize: 16
+                    }
+                  },
+                  color: '#2f4554',
+                }
+              },
+            }]
+          }
+          this.$nextTick(() => {
+            myChart.setOption(option);
+          });
+        })
+      }
+    },
+*/
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
